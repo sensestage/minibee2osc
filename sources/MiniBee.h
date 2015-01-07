@@ -22,6 +22,18 @@
 
 #include "MiniBeeConfig.h"
 
+
+//node message types
+#define MINIBEE_N_ACTIVE 'a'
+#define MINIBEE_N_CONF 'c'
+#define MINIBEE_N_DATA 'd'
+#define MINIBEE_N_EXTRA 'e'
+#define MINIBEE_N_INFO 'i'
+#define MINIBEE_N_PAUSED 'p'
+#define MINIBEE_N_SER 's'
+#define MINIBEE_N_TRIGGER 't'
+#define MINIBEE_N_WAIT 'w'
+
 namespace libminibee {
   
   enum MiniBeeStatus{
@@ -37,21 +49,32 @@ namespace libminibee {
 
   class miniXBeeConnection: public libxbee::ConCallback {
 	public:
-	  explicit miniXBeeConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL): libxbee::ConCallback(parent, type, address) {};
+	  explicit miniXBeeConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
+// 	  : libxbee::ConCallback(parent, type, address) {};
+	  void xbee_conCallback(libxbee::Pkt **pkt);
+	  MiniXBee *minibee; // points to our minibee
+  };
+
+  class miniXBee16Connection: public libxbee::ConCallback {
+	public:
+	  explicit miniXBee16Connection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
+// 	  : libxbee::ConCallback(parent, type, address) {};
 	  void xbee_conCallback(libxbee::Pkt **pkt);
 	  MiniXBee *minibee; // points to our minibee
   };
 
   class miniXBeeATConnection: public libxbee::ConCallback {
 	public:
-	  explicit miniXBeeATConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL): libxbee::ConCallback(parent, type, address) {};
+	  explicit miniXBeeATConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
+// 	  : libxbee::ConCallback(parent, type, address) {};
 	  void xbee_conCallback(libxbee::Pkt **pkt);
 	  MiniXBee *minibee; // points to our minibee
   };
   
   class miniXBeeTXConnection: public libxbee::ConCallback {
 	public:
-	  explicit miniXBeeTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL): libxbee::ConCallback(parent, type, address) {};
+	  explicit miniXBeeTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
+// 	  : libxbee::ConCallback(parent, type, address) {};
 	  void xbee_conCallback(libxbee::Pkt **pkt);
 	  MiniXBee *minibee; // points to our minibee
   };
@@ -75,8 +98,11 @@ namespace libminibee {
 	bool set64bitAddress( struct xbee_conAddress xbaddr, libxbee::XBee * xbee ); // returns false when not a valid address
 	
 	bool matchAddress( struct xbee_conAddress xbaddr ); // returns false when address does not match
+	
+	void parse_serial_message_noaddress( int msgsize, std::vector<unsigned char> data );
     private:
 	void parse_data( int msgsize, std::vector<unsigned char> data );
+	void parse_serial_message( int msgsize, std::vector<unsigned char> data );
 	void set_remote_id();
 	void send_id_message();
 	void send_config_message();
@@ -84,7 +110,7 @@ namespace libminibee {
       
 	struct xbee_conAddress addr;
 	
-	miniXBeeConnection * conData16;
+	miniXBee16Connection * conData16;
 	miniXBeeConnection * conData64;
 // 	miniXBeeConnection * conIO16;
 // 	miniXBeeConnection * conIO64;

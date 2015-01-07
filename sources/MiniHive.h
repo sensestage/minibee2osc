@@ -15,20 +15,20 @@
 
 #include "MiniBee.h"
 
-#include <list>
+#include <map>
 
 // #ifndef EXPORT
 // #define EXPORT
 // #define XBEE_EXPORT_DEFINED
 // #endif
 
-
 namespace libminibee {
   class MiniXHive; // handles connections with XBee
   
   class miniXHiveConnection: public libxbee::ConCallback {
 	public:
-	  explicit miniXHiveConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL): libxbee::ConCallback(parent, type, address) {};
+	  explicit miniXHiveConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
+// 	  : libxbee::ConCallback(parent, type, address);
 	  void xbee_conCallback(libxbee::Pkt **pkt);
 	  MiniXHive *minihive; // points to our minihive
   };
@@ -36,14 +36,16 @@ namespace libminibee {
  
   class miniXHiveTXConnection: public libxbee::ConCallback {
 	public:
-	  explicit miniXHiveTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL): libxbee::ConCallback(parent, type, address) {};
+	  explicit miniXHiveTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
+// 	  : libxbee::ConCallback(parent, type, address) {};
 	  void xbee_conCallback(libxbee::Pkt **pkt);
 	  MiniXHive *minihive; // points to our minihive
   };
 
   class miniXHiveModemConnection: public libxbee::ConCallback {
 	public:
-	  explicit miniXHiveModemConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL): libxbee::ConCallback(parent, type, address) {};
+	  explicit miniXHiveModemConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
+// 	  : libxbee::ConCallback(parent, type, address) {};
 	  void xbee_conCallback(libxbee::Pkt **pkt);
 	  MiniXHive *minihive; // points to our minihive
   };
@@ -52,14 +54,31 @@ namespace libminibee {
     public:
 	MiniXHive(void);
 	~MiniXHive(void);
+
+	int createXBee( std::string serialport, int loglevel );
+	void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data );
+	
+	int waitForPacket();
+
+	void setLogLevel( int level );
+	int getLogLevel();
+	void writeToLog( int level, const char * logstring );
 	
     private:
+      
+	MiniXBee * findMiniBeeByAddress( struct xbee_conAddress beeAddress );
+	MiniXBee * createNewMiniBee( struct xbee_conAddress beeAddress );
+      
 	struct xbee_conAddress addr;
-	libxbee::XBee xbee;
+	libxbee::XBee * xbee;
+	std::map<int,MiniXBee*> minibees;
+	int numberOfBees;
 	
-	miniXHiveConnection * conData16;
-	miniXHiveTXConnection * conTXStatus16;
-	miniXHiveModemConnection * conModemStatus;
+	libxbee::Con * con;
+	
+// 	miniXHiveConnection * conData16;
+// 	miniXHiveTXConnection * conTXStatus16;
+// 	miniXHiveModemConnection * conModemStatus;
   };
 };
 

@@ -54,6 +54,8 @@ namespace libminibee {
 	void calcDataProperties(void);
 
 	std::vector<MiniBeeDataPoint> dataPoints;
+	
+	//TODO: remove these:
       std::vector<int> dataBitSizes; // how many bits take up a value
       std::vector<int> dataOffsets; // offset of data
       std::vector<int> dataScales;  // scaling factor of data

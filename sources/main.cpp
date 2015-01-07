@@ -3,13 +3,12 @@
 #include <unistd.h>
 
 #include <xbeep.h>
+#include "MiniHive.h"
 
-#define USE_CALLBACKS
-
-// #ifdef USE_CALLBACKS
 
 /* ========================================================================== */
 
+/*
 class mainConnection: public libxbee::ConCallback {
 	public:
 		explicit mainConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL): libxbee::ConCallback(parent, type, address) {};
@@ -65,35 +64,28 @@ void mainConnection::xbee_conCallback(libxbee::Pkt **pkt) {
 	std::cout << myData;
 
 }
+*/
 
 /* ========================================================================== */
 
 int main(int argc, char *argv[]) {
-	int i;
-	try {
-		/* setup libxbee */
-		libxbee::XBee xbee("xbee1", "/dev/ttyUSB0", 57600); //TODO: serial port should be an argument to the start of program
-		std::cout << "Running libxbee in mode '" << xbee.mode() << "'\n";
-		xbee.setLogLevel( 100 ); //TODO: loglevel should be an argument to the start of the program		
+	int ret;
+	/* setup libxbee */
+	libminibee::MiniXHive * hive;
+	hive = new libminibee::MiniXHive();
+	std::cout << "Creating XBee...\n";
+	ret = hive->createXBee("/dev/ttyUSB0", 100); //TODO: serial port should be an argument to the start of program, log level too
 
-		/* make a connection for the first info data */
-		struct xbee_conAddress addr;
-		memset(&addr, 0, sizeof(addr));
-		addr.addr16_enabled = 1;
-		addr.addr16[0] = 0xFF;
-		addr.addr16[1] = 0xFA;
-		mainConnection con(xbee, "16-bit Data", &addr); /* with a callback */
-		con.myData = "Testing, 1... 2... 3...\n";
+	if ( ret == 0 ){
+	  std::cout << "Opened connection...\n";
 
-		std::cout << "Opened connection...\n";
+	  while ( true ){
+	    hive->waitForPacket();
+	    usleep(1000);
+  // 		  usleep(60000000);
+	  }
 
-		usleep(60000000);
-
-		std::cout << "Closing connection...\n";
-
-	} catch (xbee_err err) {
-		std::cout << "Error " << err << "\n";
-	}
-	
+	  std::cout << "Closing connection...\n";
+	}	
 	return 0;
 }
