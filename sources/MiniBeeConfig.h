@@ -59,6 +59,8 @@ namespace libminibee {
       std::vector<int> dataBitSizes; // how many bits take up a value
       std::vector<int> dataOffsets; // offset of data
       std::vector<int> dataScales;  // scaling factor of data
+      
+      unsigned char getConfigID();
 
     private:
       int msgTimeInterval;

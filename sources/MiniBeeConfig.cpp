@@ -50,6 +50,11 @@ MiniBeeConfig::MiniBeeConfig(){
 MiniBeeConfig::~MiniBeeConfig(){
 }
 
+unsigned char MiniBeeConfig::getConfigID()
+{
+  return configid;
+}
+
 void MiniBeeConfig::calcDataProperties(void){
   int i;
   // data order: digital - analog - twi - sht - ping
@@ -85,6 +90,59 @@ void MiniBeeConfig::calcDataProperties(void){
     }
   }
   // then twi
+   for ( i=0; i<numberOfTWIs; i++ ){ // then analog
+    switch ( twiConfig[i] ){
+      case TWI_ADXL345:
+	dataBitSizes.push_back( 16 );
+	dataBitSizes.push_back( 16 );
+	dataBitSizes.push_back( 16 );
+	dataScales.push_back( 8191 );
+	dataScales.push_back( 8191 );
+	dataScales.push_back( 8191 );
+	dataOffsets.push_back( 0 );
+	dataOffsets.push_back( 0 );
+	dataOffsets.push_back( 0 );
+	break;
+      case TWI_LIS302DL:
+	dataBitSizes.push_back( 8 );
+	dataBitSizes.push_back( 8 );
+	dataBitSizes.push_back( 8 );
+	dataScales.push_back( 255 );
+	dataScales.push_back( 255 );
+	dataScales.push_back( 255 );
+	dataOffsets.push_back( 0 );
+	dataOffsets.push_back( 0 );
+	dataOffsets.push_back( 0 );
+	break;
+      case TWI_BMP085:
+	dataBitSizes.push_back( 16 );
+	dataBitSizes.push_back( 24 );
+	dataBitSizes.push_back( 24 );
+	dataScales.push_back( 100 );
+	dataScales.push_back( 100 );
+	dataScales.push_back( 100 );
+	dataOffsets.push_back( 27300 );
+	dataOffsets.push_back( 0 );
+	dataOffsets.push_back( 10000 );
+	break;
+      case TWI_TMP102:
+	dataBitSizes.push_back( 16 );
+	dataScales.push_back( 16 );
+	dataOffsets.push_back( 2048 );
+	break;
+      case TWI_HMC58X3:
+	dataBitSizes.push_back( 16 );
+	dataBitSizes.push_back( 16 );
+	dataBitSizes.push_back( 16 );
+	dataScales.push_back( 2047 );
+	dataScales.push_back( 2047 );
+	dataScales.push_back( 2047 );
+	dataOffsets.push_back( 2048 );
+	dataOffsets.push_back( 2048 );
+	dataOffsets.push_back( 2048 );
+	break;
+    }
+  }
   
   for ( i=0; i<19; i++ ){ // then sht
     switch ( pinConfig[i] ){
@@ -112,7 +170,7 @@ void MiniBeeConfig::calcDataProperties(void){
 }
 
 std::vector<unsigned char> MiniBeeConfig::getConfigMessage( unsigned char msgid, unsigned char nodeid ){
-  //send config message (msgtype C: msg ID + node ID + config ID + configuration bytes
+  //send config message (msgtype C: msg ID + config ID + configuration bytes
   // msg time interval - 2 bytes
   // samples per message - 1 byte
   // 19 bytes pin configuration - 1 byte each
@@ -122,7 +180,7 @@ std::vector<unsigned char> MiniBeeConfig::getConfigMessage( unsigned char msgid,
   std::vector<unsigned char> mydata;
   mydata.push_back( 'C' );
   mydata.push_back( msgid );
-  mydata.push_back( nodeid );
+//   mydata.push_back( nodeid );
   mydata.push_back( configid );
   
   mydata.push_back( (unsigned char) (msgTimeInterval>>8) );
@@ -137,6 +195,6 @@ std::vector<unsigned char> MiniBeeConfig::getConfigMessage( unsigned char msgid,
   for ( int i=0; i<numberOfTWIs; i++ ){
     mydata.push_back( twiConfig[i] );
   }
-  
+
   return mydata;
 }

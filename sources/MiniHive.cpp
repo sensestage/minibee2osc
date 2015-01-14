@@ -11,37 +11,37 @@
 using namespace libxbee;
 using namespace libminibee;
 
-miniXHiveConnection::miniXHiveConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address): libxbee::ConCallback(parent, type, address)
-{};
-miniXHiveTXConnection::miniXHiveTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address): libxbee::ConCallback(parent, type, address)
-{};
-miniXHiveModemConnection::miniXHiveModemConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address): libxbee::ConCallback(parent, type, address)
-{};
+// miniXHiveConnection::miniXHiveConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address): libxbee::ConCallback(parent, type, address)
+// {};
+// miniXHiveTXConnection::miniXHiveTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address): libxbee::ConCallback(parent, type, address)
+// {};
+// miniXHiveModemConnection::miniXHiveModemConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address): libxbee::ConCallback(parent, type, address)
+// {};
 
-void miniXHiveConnection::xbee_conCallback(libxbee::Pkt **pkt) {
-	std::cout << "MiniXBee Data Callback!!\n";
-	printXBeePacket( *pkt );
-	
-	if ((*pkt)->size() > 0) {
-	  if ((*pkt)->size() > 2) { // type and msg id
-	    char type = (**pkt)[0];
-	    int msgid = (int) (**pkt)[1];
-	    int msgsize = (*pkt)->size();
-	    std::vector<unsigned char> data = (*pkt)->getVector();
-	    minihive->parseDataPacket( type, msgid, (*pkt)->size(), (*pkt)->getVector() );
-	  }
-	}
-}
-
-void miniXHiveTXConnection::xbee_conCallback(libxbee::Pkt **pkt) {
-	std::cout << "MiniXBee Tx Callback!!\n";
-	printXBeePacket( *pkt );
-}
-
-void miniXHiveModemConnection::xbee_conCallback(libxbee::Pkt **pkt) {
-	std::cout << "MiniXBee Modem Callback!!\n";
-	printXBeePacket( *pkt );
-}
+// void miniXHiveConnection::xbee_conCallback(libxbee::Pkt **pkt) {
+// 	std::cout << "MiniXBee Data Callback!!\n";
+// 	printXBeePacket( *pkt );
+// 	
+// 	if ((*pkt)->size() > 0) {
+// 	  if ((*pkt)->size() > 2) { // type and msg id
+// 	    char type = (**pkt)[0];
+// 	    int msgid = (int) (**pkt)[1];
+// 	    int msgsize = (*pkt)->size();
+// 	    std::vector<unsigned char> data = (*pkt)->getVector();
+// 	    minihive->parseDataPacket( type, msgid, (*pkt)->size(), (*pkt)->getVector() );
+// 	  }
+// 	}
+// }
+// 
+// void miniXHiveTXConnection::xbee_conCallback(libxbee::Pkt **pkt) {
+// 	std::cout << "MiniXBee Tx Callback!!\n";
+// 	printXBeePacket( *pkt );
+// }
+// 
+// void miniXHiveModemConnection::xbee_conCallback(libxbee::Pkt **pkt) {
+// 	std::cout << "MiniXBee Modem Callback!!\n";
+// 	printXBeePacket( *pkt );
+// }
 
 
 MiniXHive::MiniXHive(void)
@@ -72,6 +72,8 @@ int MiniXHive::createXBee(std::string serialport, int loglevel)
     //   conData16->minihive = this;
       con = new libxbee::Con( *xbee, "16-bit Data", &addr );
       std::cout << "created 16-bit data connection" << std::endl;
+      conTXStatus = new libxbee::Con( *xbee, "Transmit Status" );
+      std::cout << "created transmit status" << std::endl;
     //   conTXStatus16 = new miniXHiveTXConnection( *xbee, "Transmit Status", &addr );
     //   conTXStatus16->minihive = this;
     //   std::cout << "created tx connection connection" << std::endl;
@@ -113,6 +115,29 @@ int MiniXHive::waitForPacket(){
 	    return 1;
     }
   }
+
+//   if ( conTXStatus->RxAvailable() > 0 ){
+//     try {
+// 	    pkt << *con;   /* or this */
+//     } catch (xbee_err err) {
+// 	    std::cout << "Error on Rx Tx status! " << err << "\n";
+// 	    return 1;
+//     }
+//     try {
+// 	printXBeePacket( &pkt );      
+//     } catch (xbee_err err) {
+// 	    std::cout << "Error accessing TX status packet! " << err << "\n";
+// 	    return 1;
+//     }
+//   }
+
+  std::map<int,MiniXBee*>::iterator beeIt;
+//   std::cout << "packets from minibees: " << minibees.size() << std::endl;
+  for ( beeIt = minibees.begin(); beeIt != minibees.end(); ++beeIt ){
+    MiniXBee * minibee = beeIt->second;
+    minibee->waitForPacket();
+  }
+
 }
 
 void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data ){
@@ -135,13 +160,17 @@ void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<
 	    ++it;
 	  }
 	  printXBeeAddress( newAddress );
-	  MiniXBee * xbee = findMiniBeeByAddress( newAddress );
-	  if ( xbee == nullptr ){
+	  MiniXBee * minibee = findMiniBeeByAddress( newAddress );
+	  if ( minibee == NULL ){
 	     // create a new minibee
-	    xbee = createNewMiniBee(newAddress);
+	    minibee = createNewMiniBee(newAddress);
 	  }
-	  xbee->parse_serial_message_noaddress(msgsize, data);
+	  minibee->parse_serial_message_noaddress(msgsize, data);
       }
+      break;
+   case MINIBEE_N_WAIT: // serial number
+      // Serial High (SH) + Serial Low (SL) + library version + board revision + capabilities
+      std::cout << "minibee waiting message " << type << ", " << msgid << ", " << msgsize <<  std::endl;
       break;
   } 
 }
@@ -156,10 +185,12 @@ MiniXBee * MiniXHive::createNewMiniBee( struct xbee_conAddress beeAddress ){
  beeAddress.addr16[1] = (unsigned char) numberOfBees%256;
  minibee->set16bitAddress( beeAddress, xbee );
  
+ std::cout << "minibees before insert: " << minibees.size() << std::endl;
+ 
+ minibees[numberOfBees] = minibee;
+//  minibees.insert ( std::pair<int,MiniXBee*>(numberOfBees, minibee ) );
+ std::cout << "minibees after insert: " << minibees.size() << std::endl;
  minibee->createConnections(xbee);
- 
- minibees.insert ( std::pair<int,MiniXBee*>(numberOfBees, minibee ) );
- 
  return minibee;
 }
 
@@ -173,7 +204,7 @@ MiniXBee * MiniXHive::findMiniBeeByAddress( struct xbee_conAddress beeAddress ){
       }
   }
   // no minibees found
-  return nullptr;
+  return NULL;
 }
 
 void MiniXHive::writeToLog( int level, const char * logstring )

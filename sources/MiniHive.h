@@ -23,32 +23,32 @@
 // #endif
 
 namespace libminibee {
-  class MiniXHive; // handles connections with XBee
-  
-  class miniXHiveConnection: public libxbee::ConCallback {
-	public:
-	  explicit miniXHiveConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
-// 	  : libxbee::ConCallback(parent, type, address);
-	  void xbee_conCallback(libxbee::Pkt **pkt);
-	  MiniXHive *minihive; // points to our minihive
-  };
-
- 
-  class miniXHiveTXConnection: public libxbee::ConCallback {
-	public:
-	  explicit miniXHiveTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
-// 	  : libxbee::ConCallback(parent, type, address) {};
-	  void xbee_conCallback(libxbee::Pkt **pkt);
-	  MiniXHive *minihive; // points to our minihive
-  };
-
-  class miniXHiveModemConnection: public libxbee::ConCallback {
-	public:
-	  explicit miniXHiveModemConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
-// 	  : libxbee::ConCallback(parent, type, address) {};
-	  void xbee_conCallback(libxbee::Pkt **pkt);
-	  MiniXHive *minihive; // points to our minihive
-  };
+//   class MiniXHive; // handles connections with XBee
+//   
+//   class miniXHiveConnection: public libxbee::ConCallback {
+// 	public:
+// 	  explicit miniXHiveConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
+// // 	  : libxbee::ConCallback(parent, type, address);
+// 	  void xbee_conCallback(libxbee::Pkt **pkt);
+// 	  MiniXHive *minihive; // points to our minihive
+//   };
+// 
+//  
+//   class miniXHiveTXConnection: public libxbee::ConCallback {
+// 	public:
+// 	  explicit miniXHiveTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
+// // 	  : libxbee::ConCallback(parent, type, address) {};
+// 	  void xbee_conCallback(libxbee::Pkt **pkt);
+// 	  MiniXHive *minihive; // points to our minihive
+//   };
+// 
+//   class miniXHiveModemConnection: public libxbee::ConCallback {
+// 	public:
+// 	  explicit miniXHiveModemConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
+// // 	  : libxbee::ConCallback(parent, type, address) {};
+// 	  void xbee_conCallback(libxbee::Pkt **pkt);
+// 	  MiniXHive *minihive; // points to our minihive
+//   };
   
   class MiniXHive{
     public:
@@ -75,6 +75,7 @@ namespace libminibee {
 	int numberOfBees;
 	
 	libxbee::Con * con;
+	libxbee::Con * conTXStatus;
 	
 // 	miniXHiveConnection * conData16;
 // 	miniXHiveTXConnection * conTXStatus16;

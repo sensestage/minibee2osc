@@ -19,13 +19,28 @@ void printXBeePacket( libxbee::Pkt *pkt ){
 		                                                               pkthandle->address.addr64[4], pkthandle->address.addr64[5],
 		                                                               pkthandle->address.addr64[6], pkthandle->address.addr64[7]);
 	}
+	std::cout << "    packet status: " <<  pkthandle->status << std::endl;
+	std::cout << "    packet options: " <<  pkthandle->options << std::endl;
+	std::cout << "    packet rssi: " <<  pkthandle->rssi << std::endl;
+	std::cout << "    packet frameId: " <<  pkthandle->frameId << std::endl;
 	std::cout << "    packet data size: " <<  (pkt)->size() << std::endl;
-	std::cout << "    packet data: ";
-	for (i = 0; i < (pkt)->size(); i++) {
-		std::cout << (*pkt)[i];
-	}
-	std::cout << "\n";
-
+	if ( (pkt)->size() > 0 ){
+	  std::cout << "    packet data: ";
+	  for (i = 0; i < (pkt)->size(); i++) {
+		  std::cout << (*pkt)[i]  << ",";
+	  }
+	  std::cout << "\n";
+	  std::cout << "    packet data as characters: ";
+	  for (i = 0; i < (pkt)->size(); i++) {
+		  std::cout << (char) (*pkt)[i] << ",";
+	  }
+	  std::cout << "\n";
+	  std::cout << "    packet data as integers: ";
+	  for (i = 0; i < (pkt)->size(); i++) {
+		  std::cout << (int) (*pkt)[i] << ",";
+	  }
+	  std::cout << "\n";
+	  }
 }
 
 void printXBeeAddress( struct xbee_conAddress addr ){
