@@ -36,6 +36,8 @@
 
 namespace libminibee {
   
+  class MiniXHive;
+  
   enum MiniBeeStatus{
     WAIT_FORCONFIG,
     WAIT_FORCONFIRM,
@@ -85,8 +87,10 @@ namespace libminibee {
 	MiniXBee(int newid);
 	~MiniXBee(void);
 	
+	void setHive( MiniXHive * inhive );
+	
 	int waitForPacket();
-	void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data );
+	void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data);
 
 	void createConnections( libxbee::XBee * xbee );
 	
@@ -113,6 +117,7 @@ namespace libminibee {
 	struct xbee_conAddress addr16;
 	struct xbee_conAddress addr64;
 	
+	MiniXHive * hive;
 	
 	libxbee::Con * con16;
 	libxbee::Con * con16TxStatus;

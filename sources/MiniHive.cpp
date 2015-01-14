@@ -164,6 +164,7 @@ void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<
 	  if ( minibee == NULL ){
 	     // create a new minibee
 	    minibee = createNewMiniBee(newAddress);
+	    minibee->setHive( this );
 	  }
 	  minibee->parse_serial_message_noaddress(msgsize, data);
       }
@@ -223,3 +224,13 @@ void MiniXHive::setLogLevel(int level)
   xbee->setLogLevel( level );
 }
 
+// ---------- OSC ----------
+
+int MiniXHive::createOSCServer(const char* port)
+{
+  oscServer = new HiveOscServer(port);
+}
+
+int MiniXHive::setTargetAddress( const char * host, const char * port ){
+    oscServer->setTargetAddress( host, port );
+}

@@ -13,7 +13,9 @@
 #include <xbeep.h>
 #endif
 
+#include "MiniHiveOSC.h"
 #include "MiniBee.h"
+#include "osc/oscin.h"
 
 #include <map>
 
@@ -55,6 +57,9 @@ namespace libminibee {
 	MiniXHive(void);
 	~MiniXHive(void);
 
+	int createOSCServer( const char * port );
+	int setTargetAddress( const char * host, const char * port );
+
 	int createXBee( std::string serialport, int loglevel );
 	void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data );
 	
@@ -64,6 +69,8 @@ namespace libminibee {
 	int getLogLevel();
 	void writeToLog( int level, const char * logstring );
 	
+	HiveOscServer * oscServer;
+
     private:
       
 	MiniXBee * findMiniBeeByAddress( struct xbee_conAddress beeAddress );
@@ -76,7 +83,7 @@ namespace libminibee {
 	
 	libxbee::Con * con;
 	libxbee::Con * conTXStatus;
-	
+		
 // 	miniXHiveConnection * conData16;
 // 	miniXHiveTXConnection * conTXStatus16;
 // 	miniXHiveModemConnection * conModemStatus;

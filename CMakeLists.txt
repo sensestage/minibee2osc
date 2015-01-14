@@ -17,7 +17,7 @@ set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 # liblo
-# pkg_check_modules(liblo REQUIRED liblo)
+pkg_check_modules(liblo REQUIRED liblo)
 
 # libxbee
 find_package(LibXBee)
@@ -48,13 +48,13 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-#   ${liblo_INCLUDE_DIRS}
+  ${liblo_INCLUDE_DIRS}
 #   ${Boost_INCLUDE_DIRS}
   headers/
 )
 
 link_directories(
-#   ${liblo_LIBRARY_DIRS}
+  ${liblo_LIBRARY_DIRS}
   ${libxbee_LIBRARY_DIRS}
 #   ${Boost_LIBRARY_DIRS}
   ${CMAKE_BINARY_DIR}

@@ -3,6 +3,8 @@
 
 #include "MiniBee.h"
 
+#include "MiniHive.h"
+
 #include <iostream>
 #include <string.h>
 #include <unistd.h>
@@ -265,6 +267,9 @@ void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
     it++; it2++; it3++;
   }
   
+  if ( hive->oscServer != NULL ){
+    hive->oscServer->sendOutputMessage( id, &parsed_data );
+  }
 //   int i = 0;
   std::cout << "data: ";
   for (auto n : parsed_data) {
@@ -442,6 +447,11 @@ bool MiniXBee::matchAddress( struct xbee_conAddress xbaddr ){
       }
     }
     return isenabled;
+}
+
+void MiniXBee::setHive(MiniXHive * inhive)
+{
+  hive = inhive;
 }
 
 

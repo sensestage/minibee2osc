@@ -79,6 +79,9 @@ int main(int argc, char *argv[]) {
 	if ( ret == 0 ){
 	  std::cout << "Opened connection...\n";
 
+	  hive->createOSCServer("57600");
+	  hive->setTargetAddress( "127.0.0.1", "57120" );
+	  
 	  while ( true ){
 	    hive->waitForPacket();
 	    usleep(1000);
