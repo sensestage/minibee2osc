@@ -69,12 +69,12 @@ void mainConnection::xbee_conCallback(libxbee::Pkt **pkt) {
 /* ========================================================================== */
 
 int main(int argc, char *argv[]) {
-	int ret;
+	int ret, res;
 	/* setup libxbee */
 	libminibee::MiniXHive * hive;
 	hive = new libminibee::MiniXHive();
 	std::cout << "Creating XBee...\n";
-	ret = hive->createXBee("/dev/ttyUSB0", 100); //TODO: serial port should be an argument to the start of program, log level too
+	ret = hive->createXBee("/dev/ttyUSB0", 0); //TODO: serial port should be an argument to the start of program, log level too
 
 	if ( ret == 0 ){
 	  std::cout << "Opened connection...\n";
@@ -82,9 +82,13 @@ int main(int argc, char *argv[]) {
 	  hive->createOSCServer("57600");
 	  hive->setTargetAddress( "127.0.0.1", "57120" );
 	  
+	  hive->oscServer->debug(true);
+	  
 	  while ( true ){
 	    hive->waitForPacket();
-	    usleep(1000);
+	    res = hive->waitForOSC();
+// 	    std::cout << "Number of received OSC messages: " << res << std::endl;
+	    usleep(500);
   // 		  usleep(60000000);
 	  }
 

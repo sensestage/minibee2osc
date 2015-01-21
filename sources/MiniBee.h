@@ -19,6 +19,7 @@
 // #endif
 
 #include <vector>
+#include <lo/lo_osc_types.h>
 
 #include "MiniBeeConfig.h"
 
@@ -105,24 +106,49 @@ namespace libminibee {
 	bool matchAddress( struct xbee_conAddress xbaddr ); // returns false when address does not match
 	
 	void parse_serial_message_noaddress( int msgsize, std::vector<unsigned char> data );
-    private:
+
+	int send_announce_message();
+	int send_quit_message();
+	int send_output( std::vector<int> * data );
+	int send_custom( std::vector<int> * data );
+// 	int send_custom( std::vector<unsigned char> * data );
+	int send_running( int onoff );
+	int send_loopback( int onoff );
+	
+	int send_reset();
+	int send_save_id();
+	
+
+  private:
 	void initVariables();
+	
+	void setStatus( int newstatus );
+	
 	void parse_data( int msgsize, std::vector<unsigned char> data );
+	void parse_trigger( int msgsize, std::vector<unsigned char> data );
+	void parse_extra( int msgsize, std::vector<unsigned char> data );
 	void parse_serial_message( int msgsize, std::vector<unsigned char> data );
-	void set_remote_id();
-	void send_id_message();
-	void send_config_message();
+	int set_remote_id();
+	int send_id_message();
+	int send_config_message();
 	void check_configuration_message( int msgsize, std::vector<unsigned char> data );
+	
+	int send_digital_D3( unsigned char val );
+	int send_IO_D3( unsigned char val );
       
+	int sendTx16( unsigned char frameid, std::vector<unsigned char> * data );
+	int sendTx64( unsigned char frameid, std::vector<unsigned char> * data );
+	int sendAT( unsigned char frameid, std::vector<unsigned char> * data );
+
 	struct xbee_conAddress addr16;
 	struct xbee_conAddress addr64;
 	
 	MiniXHive * hive;
 	
 	libxbee::Con * con16;
-	libxbee::Con * con16TxStatus;
+// 	libxbee::Con * con16TxStatus;
 	libxbee::Con * con64;
-	libxbee::Con * con64TxStatus;	
+// 	libxbee::Con * con64TxStatus;	
 	libxbee::Con * conAT;
 	
 // 	miniXBee16Connection * conData16;

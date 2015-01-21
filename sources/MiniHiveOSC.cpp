@@ -5,6 +5,8 @@
 
 #include "MiniHiveOSC.h"
 
+#include "MiniHive.h"
+
 // #include <iostream>
 // #include <string>
 
@@ -19,10 +21,21 @@ int HiveOscServer::minibeeOutputHandler( handlerArgs )
   lo_address addr = lo_message_get_source( msg );
   HiveOscServer* server = ( HiveOscServer* ) user_data;
 
-  if ( server->postDebug )
+  if ( server->postDebug ){
     cout << "[HiveOscServer::minibeeOutputHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  }
   
-  // TODO
+  if ( argc < 1 ){
+      std::cout << "MinibeeConfigMessage: too few arguments" << std::endl;
+      return 0;
+  }
+
+  vector<int> mydata;
+  int id = argv[0]->i;
+  for ( int i=1; i<argc; i++ ){
+      mydata.push_back( argv[i]->i );
+  }
+  server->handle_minibee_output( id, &mydata );
   return 0;
 }
 
@@ -32,10 +45,19 @@ int HiveOscServer::minibeeCustomHandler( handlerArgs )
   lo_address addr = lo_message_get_source( msg );
   HiveOscServer* server = ( HiveOscServer* ) user_data;
 
-  if ( server->postDebug )
+  if ( server->postDebug ){
     cout << "[HiveOscServer::minibeeCustomHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
-  
-  // TODO
+  }
+  if ( argc < 1 ){
+      std::cout << "MinibeeCustomMessage: too few arguments" << std::endl;
+      return 0;
+  }
+  vector<int> mydata;
+  int id = argv[0]->i;
+  for ( int i=1; i<argc; i++ ){
+      mydata.push_back( argv[i]->i );
+  }
+  server->handle_minibee_custom( id, &mydata );
   return 0;
 }
 
@@ -45,8 +67,183 @@ int HiveOscServer::minibeeConfigHandler( handlerArgs )
   lo_address addr = lo_message_get_source( msg );
   HiveOscServer* server = ( HiveOscServer* ) user_data;
 
-  if ( server->postDebug )
+  if ( server->postDebug ){
     cout << "[HiveOscServer::minibeeConfigHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  }
+//   possible return messages:
+// /minibee/configuration/done node id, config id, serial number (optional)
+// /minibee/configuration/error node id, config id, serial number (optional)
+
+  if ( argc < 2 ){
+      std::cout << "MinibeeConfigMessage: too few arguments" << std::endl;
+      return 0;
+  }
+  int id = argv[0]->i;
+  int configid = argv[1]->i;
+  server->handle_minibee_config( id, configid );
+  return 0;
+}
+
+int HiveOscServer::minibeeRunHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug ){
+    cout << "[HiveOscServer::minibeeRunHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  }
+  if ( argc < 2 ){
+      std::cout << "MinibeeRunMessage: too few arguments" << std::endl;
+      return 0;
+  }
+  int id = argv[0]->i;
+  int onoff = argv[1]->i;
+  server->handle_minibee_run( id, onoff );
+  return 0;
+}
+
+int HiveOscServer::minibeeLoopbackHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug ){
+    cout << "[HiveOscServer::minibeeLoopbackHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  }
+  if ( argc < 2 ){
+      std::cout << "MinibeeLoopBackMessage: too few arguments" << std::endl;
+      return 0;
+  }
+  int id = argv[0]->i;
+  int onoff = argv[1]->i;
+  server->handle_minibee_loopback( id, onoff );
+  return 0;
+}
+
+
+int HiveOscServer::minibeeResetHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug ){
+    cout << "[HiveOscServer::minibeeResetHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  }
+  
+  if ( argc < 1 ){
+      std::cout << "MinibeeResetMessage: too few arguments" << std::endl;
+      return 0;
+  }
+  int id = argv[0]->i;
+  server->handle_minibee_reset( id );
+  return 0;
+}
+
+int HiveOscServer::minibeeAnnounceHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug ){
+    cout << "[HiveOscServer::minibeeAnnounceHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  }
+  if ( argc < 1 ){
+      std::cout << "MinibeeAnnounceMessage: too few arguments" << std::endl;
+      return 0;
+  }
+  int id = argv[0]->i;
+  server->handle_minibee_announce( id );
+  return 0;
+}
+
+int HiveOscServer::minibeeSaveIDHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug ){
+    cout << "[HiveOscServer::minibeeSaveIDHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  }
+  if ( argc < 1 ){
+      std::cout << "MinibeeSaveIDMessage: too few arguments" << std::endl;
+      return 0;
+  }
+  int id = argv[0]->i;
+  server->handle_minibee_saveid( id );
+  return 0;
+}
+
+int HiveOscServer::minihiveResetHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug ){
+    cout << "[HiveOscServer::minibeeResetHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  }
+  if ( argc < 1 ){
+      std::cout << "MinibeeResetMessage: too few arguments" << std::endl;
+      return 0;
+  }
+  int id = argv[0]->i;
+  server->handle_minibee_reset( id );
+  return 0;
+}
+
+
+int HiveOscServer::minihiveSaveConfigHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug )
+    cout << "[HiveOscServer::minihiveSaveConfigHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  
+  // TODO
+  return 0;
+}
+
+int HiveOscServer::minihiveLoadConfigHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug )
+    cout << "[HiveOscServer::minihiveLoadConfigHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  
+  // TODO
+  return 0;
+}
+
+int HiveOscServer::minihiveAnnounceHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug )
+    cout << "[HiveOscServer::minihiveAnnounceHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  
+  // TODO
+  return 0;
+}
+
+int HiveOscServer::minihiveSaveIDHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug )
+    cout << "[HiveOscServer::minihiveSaveIDHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
   
   // TODO
   return 0;
@@ -67,12 +264,119 @@ int HiveOscServer::genericHandler( handlerArgs )
   return 1;
 }
 
-void HiveOscServer::setTargetAddress(const char* host, int port){
-  targetAddress = lo_address_create_from(host, port);
+// ---------------- handling incoming osc messages ---------
+
+void HiveOscServer::handle_minibee_output(int minibeeID, vector< int >* data)
+{
+  if ( hive->send_output_to_minibee( minibeeID, data ) < 0 ){
+      // error message
+    std::cout << "Error sending output message to minibee: " << minibeeID << std::endl;
+  }
 }
 
-void HiveOscServer::setTargetAddress(const char* host, const char * port){
-  targetAddress = lo_address_new(host, port);
+void HiveOscServer::handle_minibee_custom(int minibeeID, vector< int >* data)
+{
+  if ( hive->send_custom_to_minibee( minibeeID, data ) < 0 ){
+      // error message
+    std::cout << "Error sending custom message to minibee: " << minibeeID << std::endl;
+  }
+}
+
+void HiveOscServer::handle_minibee_config(int minibeeID, int configID)
+{
+  //TODO
+//   if ( hive->send_config_to_minibee( minibeeID, configID ) < 0 ){
+//       // error message
+//     std::cout << "Error sending config message to minibee: " << minibeeID << std::endl;
+//   }
+}
+
+void HiveOscServer::handle_minibee_loopback(int minibeeID, int onoff)
+{
+  if ( hive->send_loopback_to_minibee( minibeeID, onoff ) < 0 ){
+      // error message
+    std::cout << "Error sending loopback message to minibee: " << minibeeID << std::endl;
+  }
+}
+
+void HiveOscServer::handle_minibee_run(int minibeeID, int onoff)
+{
+  if ( hive->send_running_to_minibee( minibeeID, onoff ) < 0 ){
+      // error message
+    std::cout << "Error sending running message to minibee: " << minibeeID << std::endl;
+  }
+
+}
+
+void HiveOscServer::handle_minibee_reset(int minibeeID)
+{
+  if ( hive->send_reset_to_minibee( minibeeID ) < 0 ){
+      // error message
+    std::cout << "Error sending reset message to minibee: " << minibeeID << std::endl;
+  }
+
+}
+
+void HiveOscServer::handle_minibee_saveid(int minibeeID)
+{
+  if ( hive->send_save_id_to_minibee( minibeeID ) < 0 ){
+      // error message
+    std::cout << "Error sending save id message to minibee: " << minibeeID << std::endl;
+  }
+}
+
+void HiveOscServer::handle_minibee_announce(int minibeeID)
+{
+  if ( hive->send_announce_to_minibee( minibeeID ) < 0 ){
+      // error message
+    std::cout << "Error sending announce message to minibee: " << minibeeID << std::endl;
+  }
+}
+
+// void HiveOscServer::handle_minihive_saveconfig(string filename)
+// {
+// 
+// }
+// 
+// void HiveOscServer::handle_minihive_loadconfig(string filename)
+// {
+// 
+// }
+
+void HiveOscServer::handle_minihive_reset()
+{
+  //TODO
+}
+
+void HiveOscServer::handle_minihive_saveid()
+{
+//TODO
+}
+
+void HiveOscServer::handle_minihive_announce()
+{
+//TODO
+}
+
+// ----------- sending messages to client program ----------
+
+void HiveOscServer::sendStatusMessage( int minibeeID, string status, int statusid ){
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, minibeeID );
+  lo_message_add_string( msg, status.c_str() );
+  lo_message_add_int32( msg, statusid );
+  sendMessage( targetAddress, "/minibee/status", msg );
+  lo_message_free( msg );
+}
+
+void HiveOscServer::sendInfoMessage( int minibeeID, string serialnumber, int noin, int noout ){
+  lo_message msg = lo_message_new();
+  lo_message_add_string( msg, serialnumber.c_str() );
+  lo_message_add_int32( msg, minibeeID );
+  lo_message_add_int32( msg, noin );
+  lo_message_add_int32( msg, noout );
+  sendMessage( targetAddress, "/minibee/info", msg );
+  lo_message_free( msg );
 }
 
 
@@ -82,7 +386,7 @@ void HiveOscServer::sendOutputMessage( int minibeeID, vector<float> * data ){
   for (auto n : *data) {
     lo_message_add_float( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/output", msg );
+  sendMessage( targetAddress, "/minibee/data", msg );
   lo_message_free( msg );
 }
 
@@ -106,9 +410,44 @@ void HiveOscServer::sendTriggerMessage( int minibeeID, vector<float> * data ){
   lo_message_free( msg );    
 }
 
+void HiveOscServer::sendPrivateMessage( int minibeeID, vector<unsigned char> * data ){
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, minibeeID );
+  for (auto n : *data) {
+    lo_message_add_int32( msg, n );
+  }
+  sendMessage( targetAddress, "/minibee/private", msg );
+  lo_message_free( msg );  
+}
+
+void HiveOscServer::sendTriggerMessage( int minibeeID, vector<unsigned char> * data ){
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, minibeeID );
+  for (auto n : *data) {
+    lo_message_add_int32( msg, n );
+  }
+  sendMessage( targetAddress, "/minibee/trigger", msg );
+  lo_message_free( msg );    
+}
+
+// ------------- creation methods and setting parameters ------------------
+
 HiveOscServer::HiveOscServer( const char *port ) : NonBlockOSCServer( port )
 {
-    postDebug = false;
+  postDebug = false;
+}
+
+void HiveOscServer::setHive(MiniXHive* inhive)
+{
+  hive = inhive;
+}
+
+void HiveOscServer::setTargetAddress(const char* host, int port){
+  targetAddress = lo_address_create_from(host, port);
+}
+
+void HiveOscServer::setTargetAddress(const char* host, const char * port){
+  targetAddress = lo_address_new(host, port);
 }
 
 void HiveOscServer::debug( bool onoff ){
@@ -130,11 +469,73 @@ void HiveOscServer::addBasicMethods()
 {
 	addMethod( "/minibee/output",  NULL, minibeeOutputHandler, this );    // port, name
 	addMethod( "/minibee/custom",  NULL, minibeeCustomHandler, this );    // port, name
-	addMethod( "/minibee/configuration",  NULL, minibeeConfigHandler, this );    // port, name
+	addMethod( "/minibee/configuration",  "iis", minibeeConfigHandler, this );    // port, name
+	addMethod( "/minibee/configuration",  "ii", minibeeConfigHandler, this );    // port, name
+
+// 	addMethod( "/minihive/configuration",  "s", minihiveLoadConfigHandler, this );    // port, name
+// 	addMethod( "/minihive/configuration",  "s", minihiveSaveConfigHandler, this );    // port, name
 	
+// --- load and save config ---
+// /minihive/configuration/save filename
+// /minihive/configuration/load filename
+
+	addMethod( "/minibee/run",  "ii", minibeeRunHandler, this );    // port, name
+	addMethod( "/minibee/reset",  "i", minibeeResetHandler, this );    // port, name
+	addMethod( "/minibee/saveid",  "i", minibeeSaveIDHandler, this );    // port, name
+	addMethod( "/minibee/announce", "i", minibeeAnnounceHandler, this );    // port, name
+// 
+// 	addMethod( "/minihive/reset",  "", minihiveResetHandler, this );    // port, name
+// 	addMethod( "/minihive/ids/save",  "", minihiveSaveIDHandler, this );    // port, name
+// 	addMethod( "/minihive/announce", "", minihiveAnnounceHandler, this );    // port, name
+// 
+	addMethod( "/minibee/loopback", "ii", minibeeLoopbackHandler, this );    // port, name
+
 	// The generic handler must be added last. 
 	// Otherwise it would be called instead of the handlers. 
 	addMethod( NULL, NULL, genericHandler, this );
-}
+} // end class
 
-}
+} // end namespace
+
+
+/*
+--- set configuration ---
+/minihive/configuration/create
+
+Format:
+i config id
+s config name
+i samples per message
+i message interval
+i number of pins defined (N)
+i number of TWI devices defined (M)
+
+then N times:
+  s      - pin id (e.g. A0)
+  s or i - pin function (e.g. 3, or 'AnalogIn')
+  s      - pin label (e.g. light)
+
+then M times:
+  i      - twi id (e.g. 0)
+  s or i - twi function (e.g. 10, or 'ADXL345')
+  s      - twi label (e.g. accelero)
+
+/minihive/configuration/short (as above but without separate pin definitions; those are done separately by the message that follow)
+/minihive/configuration/pin config id, pinid, pinconfig
+/minihive/configuration/twi config id, twiid, twiconfig
+
+--- query configuration ---
+/minihive/configuration/query config id
+
+/minihive/configuration/pin/query config id, pinid
+/minihive/configuration/twi/query config id, twiid
+
+
+
+--- delete a configuration
+/minihive/configuration/delete config id
+
+  possible return messages:
+    /minihive/configuration/error config id
+    /minihive/configuration/delete/done config id
+*/	

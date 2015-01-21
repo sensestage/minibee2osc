@@ -13,6 +13,8 @@
 #include <xbeep.h>
 #endif
 
+#include <string>
+
 #include "MiniHiveOSC.h"
 #include "MiniBee.h"
 #include "osc/oscin.h"
@@ -59,15 +61,32 @@ namespace libminibee {
 
 	int createOSCServer( const char * port );
 	int setTargetAddress( const char * host, const char * port );
+	int waitForOSC();
 
 	int createXBee( std::string serialport, int loglevel );
 	void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data );
-	
+	void parseDataPacketCatchall( char type, int msgid, int msgsize, std::vector<unsigned char> data, struct xbee_conAddress *address );
 	int waitForPacket();
 
+	// logging
 	void setLogLevel( int level );
 	int getLogLevel();
 	void writeToLog( int level, const char * logstring );
+	void writeToLog( int level, std::string logstring );
+	
+	
+	/// messages to minibee from OSC:
+	int send_output_to_minibee( int minibeeID, std::vector<int> * data );
+	int send_custom_to_minibee( int minibeeID, std::vector<int> * data );
+	
+	int send_running_to_minibee( int minibeeID, int onoff );
+	int send_loopback_to_minibee( int minibeeID, int onoff );
+	
+	int send_reset_to_minibee( int minibeeID );
+	int send_save_id_to_minibee( int minibeeID );
+	int send_announce_to_minibee( int minibeeID );
+	
+	
 	
 	HiveOscServer * oscServer;
 
@@ -75,14 +94,18 @@ namespace libminibee {
       
 	MiniXBee * findMiniBeeByAddress( struct xbee_conAddress beeAddress );
 	MiniXBee * createNewMiniBee( struct xbee_conAddress beeAddress );
-      
-	struct xbee_conAddress addr;
+	MiniXBee * createNewMiniBeeWithID( struct xbee_conAddress beeAddress );
+
 	libxbee::XBee * xbee;
 	std::map<int,MiniXBee*> minibees;
 	int numberOfBees;
 	
 	libxbee::Con * con;
-	libxbee::Con * conTXStatus;
+// 	libxbee::Con * conTXStatus;
+	libxbee::Con * conCatchAll;
+	libxbee::Con * conCatchAll64;
+	
+	//TODO: catch-all connection to listen for all messages - test this!
 		
 // 	miniXHiveConnection * conData16;
 // 	miniXHiveTXConnection * conTXStatus16;
