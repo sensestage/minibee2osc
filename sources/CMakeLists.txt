@@ -19,8 +19,8 @@ set(minibee_osc_SRCS
   osc/oscin.cpp
 )
 
-add_executable( minibee  ${minibee_osc_SRCS})
+add_executable( minibee2osc  ${minibee_osc_SRCS})
 
-target_link_libraries( minibee ${LIBXBEEP_LIBRARIES} ${LIBXBEE_LIBRARIES} ${liblo_LIBRARIES} )
+target_link_libraries( minibee2osc ${LIBXBEEP_LIBRARIES} ${LIBXBEE_LIBRARIES} ${liblo_LIBRARIES} )
 
-install(TARGETS minibee DESTINATION bin)
+install(TARGETS minibee2osc DESTINATION bin)
