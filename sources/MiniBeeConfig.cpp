@@ -32,8 +32,8 @@ MiniBeeConfig::MiniBeeConfig(){
   for ( i=0; i<19; i++ ){
     pinConfig[i] = UnConfigured;
   }
-  pinConfig[0] = DigitalIn; // D3
-  pinConfig[16] = AnalogIn10bit; // A6
+//   pinConfig[0] = DigitalIn; // D3
+//   pinConfig[16] = AnalogIn10bit; // A6
   pinConfig[17] = AnalogIn10bit; // A7
   
   numberOfTWIs = 1;
