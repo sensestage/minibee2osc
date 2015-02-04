@@ -6,6 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <sstream>
+
 #include "minibee_utils.h"
 
 using namespace libxbee;
@@ -57,7 +59,7 @@ MiniXHive::~MiniXHive(void)
 
 int MiniXHive::createXBee(std::string serialport, int loglevel)
 {
-    try {
+  try {
       xbee = new XBee("xbee1", serialport, 57600);
       setLogLevel(loglevel);
     //   xbee.setLogTarget();
@@ -72,7 +74,10 @@ int MiniXHive::createXBee(std::string serialport, int loglevel)
     //   conData16 = new miniXHiveConnection( *xbee, "16-bit Data", &addr );
     //   conData16->minihive = this;
       con = new libxbee::Con( *xbee, "16-bit Data", &addr );
-      std::cout << "created 16-bit data connection" << std::endl;
+      
+      std::ostringstream oss;
+      oss << "created 16-bit data connection for Hive";
+      writeToLog(10, oss.str() );
       
       struct xbee_conAddress addrCatchall;
       /* make connections for the first data */
@@ -83,7 +88,11 @@ int MiniXHive::createXBee(std::string serialport, int loglevel)
 
       struct xbee_conSettings settings;
       conCatchAll = new libxbee::Con( *xbee, "16-bit Data", &addrCatchall );
-      std::cout << "created 16-bit data catchall connection" << std::endl;
+      
+      std::ostringstream oss2;
+      oss2 << "created 16-bit data catchall connection";
+      writeToLog(10, oss2.str() );
+      
       conCatchAll->getSettings(&settings);
       settings.catchAll = 1;
       conCatchAll->setSettings(&settings);
@@ -104,14 +113,20 @@ int MiniXHive::createXBee(std::string serialport, int loglevel)
 
 
       conCatchAll64 = new libxbee::Con( *xbee, "64-bit Data", &addrCatchall64 );
-      std::cout << "created 64-bit data catchall connection" << std::endl;
+      
+      std::ostringstream oss3;
+      oss3 << "created 64-bit data catchall connection";
+      writeToLog( 10, oss3.str() );
+      
       conCatchAll64->getSettings(&settings);
       settings.catchAll = 1;
       conCatchAll64->setSettings(&settings);
       
       return 0;
     } catch (xbee_err err) {
-      std::cout << "Could not create XBee connection: " << err << "\n";
+      std::ostringstream oss;
+      oss << "Could not create XBee connection: " << err << "\n";
+      writeToLog( 1, oss.str() );
       return 1;
     }
 
@@ -132,14 +147,18 @@ int MiniXHive::waitForPacket(){
 	    //con >> pkt; /* like this */
 	    pkt << *con;   /* or this */
     } catch (xbee_err err) {
-	    std::cout << "FFFA: Error on Rx! " << err << "\n";
-	    return 1;
+      std::ostringstream oss;
+      oss << "FFFA: Error on Rx! " << err << "\n";
+      writeToLog( 1, oss.str() );
+      return 1;
     }
     try {
-// 	pkthandle = pkt.getHnd();
-	if ( this->getLogLevel() > 0 ){
-	  printXBeePacket( &pkt );
-	}
+      std::ostringstream oss;
+      streamXBeePacket( &pkt, &oss );
+      writeToLog( 10, oss.str() );
+// 	if ( this->getLogLevel() > 0 ){
+// 	  printXBeePacket( &pkt );
+// 	}
 	if ( pkt.size() > 2) { // type and msg id
 	    char type = pkt[0];
 	    int msgid = (int) pkt[1];
@@ -148,8 +167,10 @@ int MiniXHive::waitForPacket(){
 	    parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
 	}
     } catch (xbee_err err) {
-	    std::cout << "FFFA: Error accessing packet! " << err << "\n";
-	    return 1;
+      std::ostringstream oss;
+      oss << "FFFA: Error accessing packet! " << err << "\n";
+      writeToLog(1, oss.str() );
+      return 1;
     }
   }
 
@@ -158,8 +179,10 @@ int MiniXHive::waitForPacket(){
 	    //con >> pkt; /* like this */
 	    pkt << *conCatchAll;   /* or this */
     } catch (xbee_err err) {
-	    std::cout << "Catchall: Error on Rx! " << err << "\n";
-	    return 1;
+      std::ostringstream oss;
+      oss << "Catchall: Error on Rx! " << err << "\n";
+      writeToLog(1, oss.str() );
+      return 1;
     }
     try {
  	pkthandle = pkt.getHnd();
@@ -174,8 +197,10 @@ int MiniXHive::waitForPacket(){
 	    parseDataPacketCatchall( type, msgid, pkt.size(), pkt.getVector(), &(pkthandle->address) );
 	}
     } catch (xbee_err err) {
-	    std::cout << "Catchall: Error accessing packet! " << err << "\n";
-	    return 1;
+      std::ostringstream oss;
+      oss << "Catchall: Error accessing packet! " << err << "\n";
+      writeToLog( 1, oss.str() );
+      return 1;
     }
   }
 
@@ -184,14 +209,19 @@ int MiniXHive::waitForPacket(){
 	    //con >> pkt; /* like this */
 	    pkt << *conCatchAll64;   /* or this */
     } catch (xbee_err err) {
-	    std::cout << "Catchall64: Error on Rx! " << err << "\n";
-	    return 1;
+      std::ostringstream oss;
+      oss << "Catchall64: Error on Rx! " << err << "\n";
+      writeToLog( 1, oss.str() );
+      return 1;
     }
     try {
  	pkthandle = pkt.getHnd();
-	if ( this->getLogLevel() > 0 ){
-	  printXBeePacket( &pkt );
-	}
+	std::ostringstream oss;
+	streamXBeePacket( &pkt, &oss );
+	writeToLog( 10, oss.str() );
+// 	if ( this->getLogLevel() > 0 ){
+// 	  printXBeePacket( &pkt );
+// 	}
 	if ( pkt.size() > 2) { // type and msg id
 	    char type = pkt[0];
 	    int msgid = (int) pkt[1];
@@ -200,8 +230,10 @@ int MiniXHive::waitForPacket(){
 	    parseDataPacketCatchall( type, msgid, pkt.size(), pkt.getVector(), &(pkthandle->address) );
 	}
     } catch (xbee_err err) {
-	    std::cout << "Catchall64: Error accessing packet! " << err << "\n";
-	    return 1;
+      std::ostringstream oss;
+      oss << "Catchall64: Error accessing packet! " << err << "\n";
+      writeToLog( 1, oss.str() );
+      return 1;
     }
   }
 
@@ -234,10 +266,11 @@ int MiniXHive::waitForPacket(){
 void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data ){
   struct xbee_conAddress newAddress;
 
+  std::ostringstream oss;
   switch ( type ){
     case MINIBEE_N_SER: // serial number
       // Serial High (SH) + Serial Low (SL) + library version + board revision + capabilities
-      std::cout << "FFFA: minibee serial message " << type << ", " << msgid << ", " << msgsize <<  std::endl;
+      oss << "FFFA: minibee serial message " << type << ", " << msgid << ", " << msgsize <<  std::endl;
       if ( msgsize > 10 ){
 	  memset(&newAddress, 0, sizeof(newAddress));
 	  newAddress.addr64_enabled = 1;
@@ -247,20 +280,21 @@ void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<
 	    newAddress.addr64[i] = *it;
 	    ++it;
 	  }
-	  printXBeeAddress( newAddress );
+	  streamXBeeAddress( newAddress, &oss );
+// 	  printXBeeAddress( newAddress );
 	  MiniXBee * minibee = findMiniBeeByAddress( newAddress );
 	  if ( minibee == NULL ){
 	     // create a new minibee
 	    minibee = createNewMiniBee(newAddress);
 	  }
-	  minibee->parse_serial_message_noaddress(msgsize, data);
+        minibee->parse_serial_message_noaddress(msgsize, data);
       }
       break;
     case MINIBEE_N_INFO:
-      std::cout << "FFFA: minibee info message " << type << ", " << msgid << ", " << msgsize << std::endl;
+      oss << "FFFA: minibee info message " << type << ", " << msgid << ", " << msgsize << std::endl;
       break;
     default:
-      std::cout << "WARNING: minibee message " << type << ", " << msgid << ", " << msgsize << std::endl;
+      oss << "WARNING: minibee message " << type << ", " << msgid << ", " << msgsize << std::endl;
       break;
 //    case MINIBEE_N_DATA:
 //       std::cout << "FIXME: minibee data message " << type << ", " << msgid << ", " << msgsize << std::endl;
@@ -277,17 +311,19 @@ void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<
 //       std::cout << "FIXME: minibee paused message " << type << ", " << msgid << ", " << msgsize << std::endl;
 //       break;
   }
+  writeToLog( 10, oss.str() );
 }
 
 
 void MiniXHive::parseDataPacketCatchall( char type, int msgid, int msgsize, std::vector<unsigned char> data, struct xbee_conAddress *address ){
   struct xbee_conAddress newAddress;
   MiniXBee * minibee;
+  std::ostringstream oss;
 
   switch ( type ){
     case MINIBEE_N_SER: // serial number
       // Serial High (SH) + Serial Low (SL) + library version + board revision + capabilities
-      std::cout << "Catchall: minibee serial message " << type << ", " << msgid << ", " << msgsize <<  std::endl;
+      oss << "Catchall: minibee serial message " << type << ", " << msgid << ", " << msgsize <<  std::endl;
       if ( msgsize > 10 ){
 	  memset(&newAddress, 0, sizeof(newAddress));
 	  newAddress.addr64_enabled = 1;
@@ -297,9 +333,10 @@ void MiniXHive::parseDataPacketCatchall( char type, int msgid, int msgsize, std:
 	    newAddress.addr64[i] = *it;
 	    ++it;
 	  }
-	  if ( this->getLogLevel() > 0 ){
-	    printXBeeAddress( newAddress );
-	  }
+	  streamXBeeAddress( newAddress, &oss );
+// 	  if ( this->getLogLevel() > 0 ){
+// 	    printXBeeAddress( newAddress );
+// 	  }
 	  minibee = findMiniBeeByAddress( newAddress );
 	  if ( minibee == NULL ){
 	     // create a new minibee
@@ -310,15 +347,16 @@ void MiniXHive::parseDataPacketCatchall( char type, int msgid, int msgsize, std:
       }
       break;
     case MINIBEE_N_INFO:
-      std::cout << "Catchall: minibee info message " << type << ", " << msgid << ", " << msgsize << std::endl;
+      oss << "Catchall: minibee info message " << type << ", " << msgid << ", " << msgsize << std::endl;
       break;
     default:
-      std::cout << "Catchall: minibee message " << type << ", " << msgid << ", " << msgsize << std::endl;
+      oss << "Catchall: minibee message " << type << ", " << msgid << ", " << msgsize << std::endl;
       memset(&newAddress, 0, sizeof(newAddress));
       newAddress.addr16_enabled = address->addr16_enabled;
       newAddress.addr16[0] = address->addr16[0];
       newAddress.addr16[1] = address->addr16[1];
-      printXBeeAddress( newAddress );
+      streamXBeeAddress( newAddress, &oss );
+//       printXBeeAddress( newAddress );
       minibee = findMiniBeeByAddress( newAddress );
       if ( minibee == NULL ){
 	  // create a new minibee
@@ -326,12 +364,14 @@ void MiniXHive::parseDataPacketCatchall( char type, int msgid, int msgsize, std:
       }
       minibee->send_announce_message();
       break;
-  } 
+  }
+  writeToLog( 10, oss.str() );
 }
 
 MiniXBee * MiniXHive::createNewMiniBee( struct xbee_conAddress beeAddress ){
  numberOfBees++;
  MiniXBee * minibee = new MiniXBee( numberOfBees );
+ minibee->setHive( this );
  minibee->set64bitAddress( beeAddress, xbee );
  
  beeAddress.addr16_enabled = 1;
@@ -342,7 +382,9 @@ MiniXBee * MiniXHive::createNewMiniBee( struct xbee_conAddress beeAddress ){
  minibees[numberOfBees] = minibee;
 //  std::cout << "minibees after insert: " << minibees.size() << std::endl;
  minibee->createConnections(xbee);
- minibee->setHive( this );
+ 
+ oscServer->sendInfoMessage(numberOfBees, xbeeAddress64AsString( beeAddress ) );
+
  return minibee;
 }
 
@@ -350,18 +392,21 @@ MiniXBee * MiniXHive::createNewMiniBeeWithID( struct xbee_conAddress beeAddress 
 //  numberOfBees++;
  int id = beeAddress.addr16[0]*256 + beeAddress.addr16[1];
  MiniXBee * minibee = new MiniXBee( id );
- minibee->set16bitAddress( beeAddress, xbee );
- std::cout << "minibees before insert: " << minibees.size() << std::endl; 
- minibees[id] = minibee;
- std::cout << "minibees after insert: " << minibees.size() << std::endl;
- minibee->createConnections(xbee);
  minibee->setHive( this );
+ minibee->set16bitAddress( beeAddress, xbee );
+//  std::cout << "minibees before insert: " << minibees.size() << std::endl; 
+ minibees[id] = minibee;
+//  std::cout << "minibees after insert: " << minibees.size() << std::endl;
+ minibee->createConnections(xbee);
+  
+ oscServer->sendInfoMessage(id, xbeeAddress64AsString( beeAddress ) );
+
  return minibee;
 }
 
 MiniXBee * MiniXHive::findMiniBeeByAddress( struct xbee_conAddress beeAddress ){
   std::map<int,MiniXBee*>::iterator beeIt;
-  std::cout << "minibees: " << minibees.size() << std::endl;
+//   std::cout << "minibees: " << minibees.size() << std::endl;
   for ( beeIt = minibees.begin(); beeIt != minibees.end(); ++beeIt ){
     MiniXBee * minibee = beeIt->second;
     if ( minibee != NULL ){
@@ -381,7 +426,7 @@ void MiniXHive::writeToLog( int level, const char * logstring )
   xbee_log( myXBee, level, logstring );
 }
 
-void MiniXHive::writeToLog( int level, string logstring )
+void MiniXHive::writeToLog( int level, std::string logstring )
 {
   writeToLog( level, logstring.c_str() );
 }
@@ -401,7 +446,9 @@ void MiniXHive::setLogLevel(int level)
 int MiniXHive::createOSCServer(const char* port)
 {
   oscServer = new HiveOscServer(port);
-  std::cout << "Created OSC server at port " << oscServer->getPort() << std::endl;
+  std::ostringstream oss;
+  oss << "Created OSC server at port " << oscServer->getPort();
+  writeToLog(10, oss.str() );
   oscServer->setHive( this );
   oscServer->addBasicMethods();
 }

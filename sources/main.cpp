@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #include <xbeep.h>
 #include "MiniHive.h"
@@ -70,19 +71,52 @@ void mainConnection::xbee_conCallback(libxbee::Pkt **pkt) {
 
 int main(int argc, char *argv[]) {
 	int ret, res;
-	/* setup libxbee */
+	const char * serialport = "/dev/ttyUSB0";
+	const char * targetip = "127.0.0.1";
+	const char * targetport = "57120";
+	const char * listenport = "57600";
+	int loglevel = 0;
+	// 1: serialport, 2: listenport, 3: sendport, 4: sendip, 5: loglevel
+	if ( argc > 5 ){
+	    loglevel = atoi( argv[5] );
+	}
+	if ( argc > 4 ){
+	  targetip = argv[4];
+	}
+	if ( argc > 3 ){
+	  targetport = argv[3];
+	}
+	if ( argc > 2 ){
+	  listenport = argv[2];
+	}
+	if ( argc > 1 ){
+	  serialport = argv[1];
+	}
+	
+	std::cout << "=============================================================" << std::endl;
+	std::cout << "XBee to OSC" << std::endl;
+	std::cout << "serial port: " << serialport << std::endl;
+	std::cout << "listening port: " << listenport << std::endl;
+	std::cout << "target ip: " << targetip << ", target port: " << targetport << std::endl;
+	std::cout << "loglevel: " << loglevel << std::endl;
+	std::cout << "=============================================================" << std::endl;
+	
+	  /* setup libxbee */
 	libminibee::MiniXHive * hive;
 	hive = new libminibee::MiniXHive();
 	std::cout << "Creating XBee...\n";
-	ret = hive->createXBee("/dev/ttyUSB0", 0); //TODO: serial port should be an argument to the start of program, log level too
+	
+	ret = hive->createXBee(serialport, loglevel); //TODO: serial port should be an argument to the start of program, log level too
 
 	if ( ret == 0 ){
 	  std::cout << "Opened connection...\n";
 
-	  hive->createOSCServer("57600");
-	  hive->setTargetAddress( "127.0.0.1", "57120" );
+	  hive->createOSCServer(listenport);
+	  hive->setTargetAddress( targetip, targetport );
 	  
-	  hive->oscServer->debug(true);
+	  if ( loglevel > 0 ){
+	    hive->oscServer->debug(true);
+	  }
 	  
 	  while ( true ){
 	    hive->waitForPacket();

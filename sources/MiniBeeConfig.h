@@ -65,6 +65,11 @@ namespace libminibee {
     private:
       int msgTimeInterval;
       int samplesPerMessage;
+      
+      unsigned char numberOfCustomInputs;
+      unsigned char * customInputSizes;
+      unsigned char * customInputPins;
+      
       unsigned char pinConfig[19];
       unsigned char numberOfTWIs;
       unsigned char * twiConfig;

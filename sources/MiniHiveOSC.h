@@ -27,7 +27,7 @@ namespace libminibee {
       void setTargetAddress( const char * host, const char * port );
       
       void sendStatusMessage( int minibeeID, std::string status, int statusid );
-      void sendInfoMessage( int minibeeID, std::string serialnumber, int noin, int noout );
+      void sendInfoMessage( int minibeeID, std::string serialnumber, int noin=0, int noout=0 );
       void sendOutputMessage( int minibeeID, std::vector<float> * data );
       void sendTriggerMessage( int minibeeID, std::vector<unsigned char> * data );
       void sendPrivateMessage( int minibeeID, std::vector<unsigned char> * data );

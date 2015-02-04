@@ -7,8 +7,8 @@
 
 Next steps:
 
-* add osc interface
-* add sending data to minibee
++ add osc interface
++ add sending data to minibee
 
 
 * read xml configuration file
@@ -16,6 +16,6 @@ Next steps:
 * add interpreting RSSI data
 
 * send osc info message
-* send osc status message
-* parse extra message
++ send osc status message
++ parse extra message
 * parse trigger message

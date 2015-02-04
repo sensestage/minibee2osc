@@ -33,6 +33,7 @@ MiniBeeConfig::MiniBeeConfig(){
     pinConfig[i] = UnConfigured;
   }
   pinConfig[0] = DigitalIn; // D3
+  pinConfig[16] = AnalogIn10bit; // A6
   pinConfig[17] = AnalogIn10bit; // A7
   
   numberOfTWIs = 1;
@@ -42,6 +43,16 @@ MiniBeeConfig::MiniBeeConfig(){
     twiConfig = (unsigned char*) malloc(numberOfTWIs * sizeof( unsigned char ) );
     twiConfig[0] = TWI_ADXL345; //FIXME: a default!
   }
+
+  numberOfCustomInputs = 1;
+  if ( numberOfCustomInputs > 0 ){
+    customInputSizes = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
+    customInputPins = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
+    customInputSizes[0] = 1; //FIXME: a default!
+    customInputPins[0] = 0;  //FIXME: a default!
+  }
+  // deal with custom pins
+  
   configid = 1;
   
   calcDataProperties();
@@ -57,6 +68,22 @@ unsigned char MiniBeeConfig::getConfigID()
 
 void MiniBeeConfig::calcDataProperties(void){
   int i;
+  
+  for ( i=0; i<numberOfCustomInputs; i++ ){
+      switch ( customInputSizes[i] ){
+	case 1: 
+	  dataBitSizes.push_back(8);
+	  dataScales.push_back( 1 );
+	  dataOffsets.push_back( 0 );
+	  break;
+	case 2: 
+	  dataBitSizes.push_back(16);
+	  dataScales.push_back( 1 );
+	  dataOffsets.push_back( 0 );
+	  break;
+      }
+  }
+  
   // data order: digital - analog - twi - sht - ping
   for ( i=0; i<19; i++ ){ // digital first
     switch ( pinConfig[i] ){
@@ -90,7 +117,7 @@ void MiniBeeConfig::calcDataProperties(void){
     }
   }
   // then twi
-   for ( i=0; i<numberOfTWIs; i++ ){ // then analog
+   for ( i=0; i<numberOfTWIs; i++ ){ // then twis
     switch ( twiConfig[i] ){
       case TWI_ADXL345:
 	dataBitSizes.push_back( 16 );
