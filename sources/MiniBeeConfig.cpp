@@ -25,7 +25,7 @@ MiniBeeDataPoint::~MiniBeeDataPoint(){
 
 MiniBeeConfig::MiniBeeConfig(){
   //FIXME: these are all defaults
-  msgTimeInterval = 50;
+  msgTimeInterval = 30;
   samplesPerMessage = 1;
   
   int i;
