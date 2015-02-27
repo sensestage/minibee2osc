@@ -25,14 +25,21 @@ MiniBeeDataPoint::~MiniBeeDataPoint(){
 
 MiniBeeConfig::MiniBeeConfig(){
   //FIXME: these are all defaults
-  msgTimeInterval = 30;
-  samplesPerMessage = 1;
+   msgTimeInterval = 28;
+   samplesPerMessage = 4;
+//   msgTimeInterval = 15;
+//   samplesPerMessage = 1;
   
   int i;
   for ( i=0; i<19; i++ ){
     pinConfig[i] = UnConfigured;
   }
 //   pinConfig[0] = DigitalIn; // D3
+//   pinConfig[1] = DigitalIn; // D4
+//   pinConfig[2] = DigitalOut; // D5
+  pinConfig[0] = Custom; // D3
+  pinConfig[2] = Custom; // D5
+  pinConfig[4] = Custom; // D7
 //   pinConfig[16] = AnalogIn10bit; // A6
   pinConfig[17] = AnalogIn10bit; // A7
   
@@ -44,12 +51,19 @@ MiniBeeConfig::MiniBeeConfig(){
     twiConfig[0] = TWI_ADXL345; //FIXME: a default!
   }
 
-  numberOfCustomInputs = 1;
+  numberOfCustomInputs = 4;
+//   numberOfCustomInputs = 1;
   if ( numberOfCustomInputs > 0 ){
     customInputSizes = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
     customInputPins = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
     customInputSizes[0] = 1; //FIXME: a default!
+    customInputSizes[1] = 1; //FIXME: a default!
+    customInputSizes[2] = 1; //FIXME: a default!
+    customInputSizes[3] = 2; //FIXME: a default!
     customInputPins[0] = 0;  //FIXME: a default!
+    customInputPins[1] = 2;  //FIXME: a default!
+    customInputPins[2] = 4;  //FIXME: a default!
+    customInputPins[2] = 0;  //FIXME: a default!
   }
   // deal with custom pins
   
@@ -65,6 +79,12 @@ unsigned char MiniBeeConfig::getConfigID()
 {
   return configid;
 }
+
+int MiniBeeConfig::getSamplesPerMessage()
+{
+  return samplesPerMessage;
+}
+
 
 void MiniBeeConfig::calcDataProperties(void){
   int i;

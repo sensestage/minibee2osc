@@ -74,6 +74,7 @@ namespace libminibee {
 	void writeToLog( int level, const char * logstring );
 	void writeToLog( int level, std::string logstring );
 	
+	int send_announce_message_toFFFA();
 	
 	/// messages to minibee from OSC:
 	int send_output_to_minibee( int minibeeID, std::vector<int> * data );
@@ -104,6 +105,8 @@ namespace libminibee {
 // 	libxbee::Con * conTXStatus;
 	libxbee::Con * conCatchAll;
 	libxbee::Con * conCatchAll64;
+	
+	int mymsgid;
 	
 	//TODO: catch-all connection to listen for all messages - test this!
 		

@@ -61,6 +61,8 @@ namespace libminibee {
       std::vector<int> dataScales;  // scaling factor of data
       
       unsigned char getConfigID();
+      
+      int getSamplesPerMessage();
 
     private:
       int msgTimeInterval;

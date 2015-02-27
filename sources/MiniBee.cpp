@@ -218,94 +218,100 @@ void MiniXBee::parse_extra( int msgsize, std::vector<unsigned char> data ){
 void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
   std::vector<float> parsed_data;
   // iterate over the dataBitSizes
-  unsigned char curbyte = data[0];
-  std::vector<int>::iterator it = configuration->dataBitSizes.begin();
-  std::vector<int>::iterator it2 = configuration->dataScales.begin();
-  std::vector<int>::iterator it3 = configuration->dataOffsets.begin();
   std::vector<unsigned char>::iterator itData = data.begin();
-  itData++; itData++; // 'd', msgid
-  // TODO parse data
-  unsigned char curData = *itData;
-  int curBitSize = 0;
-  int curBitIndex = 0;
-  unsigned char curBitMask;
-  float newdata;
-  bool prev1bit = false;
-  while ( it != configuration->dataBitSizes.end() ){
-//     std::cout << "data: " << (*itData) << "bitsize: " << (*it) << ", dataScale: " << (*it2) << ", dataOffsets: " << (*it3) << std::endl;
-    curBitSize = (*it);
-    if ( curBitSize == 1 ){
-      prev1bit = true;
-      if ( curData & curBitMask ){
-	newdata = 1;
-      } else {
-	newdata = 0;
-      }
-      newdata = ( (float) newdata + (*it3) / (*it2) );
-      parsed_data.push_back(newdata);
-      curBitIndex++;
-      curBitMask << 1;
-      if ( curBitIndex == 8 ){
+  itData++; itData++; // 'd', msgid    
+  
+  for ( int i=0; i < configuration->getSamplesPerMessage(); i++ ){    
+    std::vector<int>::iterator it = configuration->dataBitSizes.begin();
+    std::vector<int>::iterator it2 = configuration->dataScales.begin();
+    std::vector<int>::iterator it3 = configuration->dataOffsets.begin();
+    // TODO parse data
+    unsigned char curData = *itData;
+    int curBitSize = 0;
+    int curBitIndex = 0;
+    unsigned char curBitMask;
+    float newdata;
+    bool prev1bit = false;
+    while ( it != configuration->dataBitSizes.end() ){
+  //     std::cout << "data: " << (*itData) << "bitsize: " << (*it) << ", dataScale: " << (*it2) << ", dataOffsets: " << (*it3) << std::endl;
+      curBitSize = (*it);
+      if ( curBitSize == 1 ){ // FIXME: this does not work correctly yet
+	prev1bit = true;
+	if ( curData & curBitMask ){
+	  newdata = 1;
+	} else {
+	  newdata = 0;
+	}
+	newdata = ( (float) newdata + (*it3) / (*it2) );
+	parsed_data.push_back(newdata);
+	curBitIndex++;
+	curBitMask << 1;
+	if ( curBitIndex == 8 ){
+	    prev1bit = false;
+	    itData++;
+	    curData = *itData;
+	    if ( itData == data.end() ){
+	      std::ostringstream oss;
+	      oss << "Data too short! Early return from data!" << std::endl;
+	      hive->writeToLog( 2, oss.str() );
+	      break;
+	    }
+	    curBitIndex = 0;
+	    curBitMask = 1;
+	}
+      } else { // other options are 8, 16, 24 bit for now
+	if ( prev1bit ){
 	  prev1bit = false;
 	  itData++;
-	  curData = *itData;
 	  if ( itData == data.end() ){
-	    std::ostringstream oss;
-	    oss << "Data too short! Early return from data!" << std::endl;
-	    hive->writeToLog( 2, oss.str() );
-	    break;
+	      std::ostringstream oss;
+	      oss << "Data too short! Early return from data!" << std::endl;
+	      hive->writeToLog( 2, oss.str() );
+	      break;
 	  }
-	  curBitIndex = 0;
-	  curBitMask = 1;
-      }
-    } else { // other options are 8, 16, 24 bit for now
-      if ( prev1bit ){
-	prev1bit = false;
-	itData++;
-	if ( itData == data.end() ){
-	    std::ostringstream oss;
-	    oss << "Data too short! Early return from data!" << std::endl;
-	    hive->writeToLog( 2, oss.str() );
+	}
+	switch( curBitSize ){
+	  case 8:
+	    newdata = ( (float) curData + (*it3) )/ (float) (*it2);
+	    parsed_data.push_back(newdata);
+	    itData++;
+	    curData = *itData;
+	    break;
+	  case 16:
+	    newdata = (float) curData * 256.;
+	    itData++;
+	    curData = *itData;
+	    newdata += (float) curData;
+	    newdata = (float) (newdata + (*it3)) / (float) (*it2 );
+	    parsed_data.push_back(newdata);
+	    itData++;
+	    curData = *itData;
+	    break;
+	  case 24:
+	    newdata = (float) curData * 256. * 256.;
+	    itData++;
+	    curData = *itData;
+	    newdata += (float) curData * 256.;
+	    itData++;
+	    curData = *itData;
+	    newdata += (float) curData;
+	    newdata = (newdata + (float) (*it3)) / (float) (*it2 );
+	    parsed_data.push_back(newdata);
+	    itData++;
+	    curData = *itData;
 	    break;
 	}
       }
-      switch( curBitSize ){
-	case 8:
-	  newdata = ( (float) curData + (*it3) )/ (float) (*it2);
-	  parsed_data.push_back(newdata);
-	  itData++;
-	  curData = *itData;
-	  break;
-	case 16:
-	  newdata = (float) curData * 256.;
-	  itData++;
-	  curData = *itData;
-	  newdata += (float) curData;
-	  newdata = (float) (newdata + (*it3)) / (float) (*it2 );
-	  parsed_data.push_back(newdata);
-	  itData++;
-	  curData = *itData;
-	  break;
-	case 24:
-	  newdata = (float) curData * 256. * 256.;
-	  itData++;
-	  curData = *itData;
-	  newdata += (float) curData * 256.;
-	  itData++;
-	  curData = *itData;
-	  newdata += (float) curData;
-	  newdata = (newdata + (float) (*it3)) / (float) (*it2 );
-	  parsed_data.push_back(newdata);
-	  itData++;
-	  curData = *itData;
-	  break;
-      }
+      it++; it2++; it3++;
     }
-    it++; it2++; it3++;
   }
-  
+    
   if ( hive->oscServer != NULL ){
-    hive->oscServer->sendOutputMessage( id, &parsed_data );
+    if ( configuration->getSamplesPerMessage() == 1 ){
+      hive->oscServer->sendOutputMessage( id, &parsed_data );
+    } else {
+      hive->oscServer->sendOutputBlockMessage( id, configuration->getSamplesPerMessage(), &parsed_data );
+    }
   }
 //   int i = 0;
   std::ostringstream oss;

@@ -71,7 +71,7 @@ void mainConnection::xbee_conCallback(libxbee::Pkt **pkt) {
 
 int main(int argc, char *argv[]) {
 	int ret, res;
-	const char * serialport = "/dev/ttyUSB0";
+	const char * serialport = "/dev/ttyUSB1";
 	const char * targetip = "127.0.0.1";
 	const char * targetport = "57120";
 	const char * listenport = "57600";

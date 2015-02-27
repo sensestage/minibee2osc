@@ -380,7 +380,7 @@ void HiveOscServer::sendInfoMessage( int minibeeID, string serialnumber, int noi
 }
 
 
-void HiveOscServer::sendOutputMessage( int minibeeID, vector<float> * data ){
+void HiveOscServer::sendOutputMessage( int minibeeID, std::vector<float> * data ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, minibeeID );
   for (auto n : *data) {
@@ -390,7 +390,18 @@ void HiveOscServer::sendOutputMessage( int minibeeID, vector<float> * data ){
   lo_message_free( msg );
 }
 
-void HiveOscServer::sendPrivateMessage( int minibeeID, vector<float> * data ){
+void HiveOscServer::sendOutputBlockMessage( int minibeeID, int noSamples, std::vector<float> * data ){
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, minibeeID );
+  lo_message_add_int32( msg, noSamples );
+  for (auto n : *data) {
+    lo_message_add_float( msg, n );
+  }
+  sendMessage( targetAddress, "/minibee/data/block", msg );
+  lo_message_free( msg );
+}
+
+void HiveOscServer::sendPrivateMessage( int minibeeID, std::vector<float> * data ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, minibeeID );
   for (auto n : *data) {
@@ -400,7 +411,7 @@ void HiveOscServer::sendPrivateMessage( int minibeeID, vector<float> * data ){
   lo_message_free( msg );  
 }
 
-void HiveOscServer::sendTriggerMessage( int minibeeID, vector<float> * data ){
+void HiveOscServer::sendTriggerMessage( int minibeeID, std::vector<float> * data ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, minibeeID );
   for (auto n : *data) {
@@ -410,7 +421,7 @@ void HiveOscServer::sendTriggerMessage( int minibeeID, vector<float> * data ){
   lo_message_free( msg );    
 }
 
-void HiveOscServer::sendPrivateMessage( int minibeeID, vector<unsigned char> * data ){
+void HiveOscServer::sendPrivateMessage( int minibeeID, std::vector<unsigned char> * data ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, minibeeID );
   for (auto n : *data) {
@@ -420,7 +431,7 @@ void HiveOscServer::sendPrivateMessage( int minibeeID, vector<unsigned char> * d
   lo_message_free( msg );  
 }
 
-void HiveOscServer::sendTriggerMessage( int minibeeID, vector<unsigned char> * data ){
+void HiveOscServer::sendTriggerMessage( int minibeeID, std::vector<unsigned char> * data ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, minibeeID );
   for (auto n : *data) {

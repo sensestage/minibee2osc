@@ -48,7 +48,8 @@ using namespace libminibee;
 
 MiniXHive::MiniXHive(void)
 {
-  numberOfBees = 0; 
+  numberOfBees = 0;
+  mymsgid = 0;
 }
 
 MiniXHive::~MiniXHive(void)
@@ -300,10 +301,11 @@ void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<
 //       std::cout << "FIXME: minibee data message " << type << ", " << msgid << ", " << msgsize << std::endl;
 //       // send back announce message
 //       break;
-//    case MINIBEE_N_WAIT: // serial number
+   case MINIBEE_N_WAIT: // serial number
 //       // Serial High (SH) + Serial Low (SL) + library version + board revision + capabilities
-//       std::cout << "FIXME: minibee waiting message " << type << ", " << msgid << ", " << msgsize <<  std::endl;
-//       break;
+      send_announce_message_toFFFA();
+      std::cout << "FIXME: minibee waiting message " << type << ", " << msgid << ", " << msgsize <<  std::endl;
+      break;
 //    case MINIBEE_N_ACTIVE:
 //       std::cout << "FIXME: minibee active message " << type << ", " << msgid << ", " << msgsize << std::endl;
 //       break;
@@ -314,6 +316,37 @@ void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<
   writeToLog( 10, oss.str() );
 }
 
+
+int MiniXHive::send_announce_message_toFFFA(){
+  int retval;
+  std::vector<unsigned char> mydata;
+  mydata.push_back( 'A' );
+//   std::cout << "announce message: " << std::endl;
+  unsigned char frameid = mymsgid;
+  try{
+    if ( con->Tx( &frameid, mydata ) != XBEE_ENONE ) {
+      std::ostringstream oss;
+      oss << "MiniBee: error transmitting 16bit" << std::endl;
+      writeToLog(2, oss.str() );
+      retval = -1;
+    } else {
+      retval = 0;
+    }
+  } catch (xbee_err err) {
+      std::ostringstream oss;
+      oss << "MiniBee: error transmitting via connection 16bit" << err << "\n";
+      writeToLog(1, oss.str() );
+      retval = -1;
+  } catch (libxbee::xbee_etx etx ){
+      std::ostringstream oss;
+      oss << "MiniBee: etx error transmitting via connection 16bit" << etx.ret << "\n";
+      writeToLog(1, oss.str() );
+      retval = -1;   
+  }
+  mymsgid++;
+  mymsgid = mymsgid%256;
+  return retval;
+}
 
 void MiniXHive::parseDataPacketCatchall( char type, int msgid, int msgsize, std::vector<unsigned char> data, struct xbee_conAddress *address ){
   struct xbee_conAddress newAddress;
