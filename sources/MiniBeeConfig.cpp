@@ -37,11 +37,11 @@ MiniBeeConfig::MiniBeeConfig(){
 //   pinConfig[0] = DigitalIn; // D3
 //   pinConfig[1] = DigitalIn; // D4
 //   pinConfig[2] = DigitalOut; // D5
-  pinConfig[0] = Custom; // D3
-  pinConfig[2] = Custom; // D5
-  pinConfig[4] = Custom; // D7
+//   pinConfig[0] = Custom; // D3
+//   pinConfig[2] = Custom; // D5
+//   pinConfig[4] = Custom; // D7
 //   pinConfig[16] = AnalogIn10bit; // A6
-  pinConfig[17] = AnalogIn10bit; // A7
+//   pinConfig[17] = AnalogIn10bit; // A7
   
   numberOfTWIs = 1;
   if ( numberOfTWIs > 0 ){
@@ -51,19 +51,20 @@ MiniBeeConfig::MiniBeeConfig(){
     twiConfig[0] = TWI_ADXL345; //FIXME: a default!
   }
 
-  numberOfCustomInputs = 4;
+  numberOfCustomInputs = 0;
+//   numberOfCustomInputs = 4;
 //   numberOfCustomInputs = 1;
   if ( numberOfCustomInputs > 0 ){
     customInputSizes = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
     customInputPins = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
-    customInputSizes[0] = 1; //FIXME: a default!
-    customInputSizes[1] = 1; //FIXME: a default!
-    customInputSizes[2] = 1; //FIXME: a default!
-    customInputSizes[3] = 2; //FIXME: a default!
-    customInputPins[0] = 0;  //FIXME: a default!
-    customInputPins[1] = 2;  //FIXME: a default!
-    customInputPins[2] = 4;  //FIXME: a default!
-    customInputPins[2] = 0;  //FIXME: a default!
+//     customInputSizes[0] = 1; //FIXME: a default!
+//     customInputSizes[1] = 1; //FIXME: a default!
+//     customInputSizes[2] = 1; //FIXME: a default!
+//     customInputSizes[3] = 2; //FIXME: a default!
+//     customInputPins[0] = 0;  //FIXME: a default!
+//     customInputPins[1] = 2;  //FIXME: a default!
+//     customInputPins[2] = 4;  //FIXME: a default!
+//     customInputPins[2] = 0;  //FIXME: a default!
   }
   // deal with custom pins
   
