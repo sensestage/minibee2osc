@@ -8,8 +8,8 @@
 # when other libraries or executables link to Hello
 # target_include_directories (xbee_osc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(minibee_osc_SRCS
-  main.cpp
+set(minibee_osc_lib_SRCS
+#   main.cpp
   MiniBee.cpp
   MiniHive.cpp
   MiniBeeConfig.cpp
@@ -19,8 +19,8 @@ set(minibee_osc_SRCS
   osc/oscin.cpp
 )
 
-add_executable( minibee2osc  ${minibee_osc_SRCS})
+add_library( sensestage ${minibee_osc_lib_SRCS})
 
-target_link_libraries( minibee2osc ${LIBXBEEP_LIBRARIES} ${LIBXBEE_LIBRARIES} ${liblo_LIBRARIES} )
+target_link_libraries( sensestage ${LIBXBEEP_LIBRARIES} ${LIBXBEE_LIBRARIES} ${liblo_LIBRARIES} )
 
-install(TARGETS minibee2osc DESTINATION bin)
+install(TARGETS sensestage DESTINATION lib)

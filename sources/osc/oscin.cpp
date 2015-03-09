@@ -35,7 +35,7 @@
  *                                                                                   *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "oscin.h"
+#include "osc/oscin.h"
 
 #include <sstream>
 
