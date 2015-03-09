@@ -91,6 +91,10 @@ namespace libminibee {
 	
 	HiveOscServer * oscServer;
 
+	// moved from private
+	int numberOfBees;
+	int mymsgid;
+
     private:
       
 	MiniXBee * findMiniBeeByAddress( struct xbee_conAddress beeAddress );
@@ -99,14 +103,11 @@ namespace libminibee {
 
 	libxbee::XBee * xbee;
 	std::map<int,MiniXBee*> minibees;
-	int numberOfBees;
 	
 	libxbee::Con * con;
 // 	libxbee::Con * conTXStatus;
 	libxbee::Con * conCatchAll;
 	libxbee::Con * conCatchAll64;
-	
-	int mymsgid;
 	
 	//TODO: catch-all connection to listen for all messages - test this!
 		

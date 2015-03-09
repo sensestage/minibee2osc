@@ -117,12 +117,17 @@ namespace libminibee {
 	
 	int send_reset();
 	int send_save_id();
-	
+
+	// moved from private:
+	void initVariables();
+	MiniBeeConfig * configuration;
+	unsigned char id;    // node id of the minibee
 
   private:
-	void initVariables();
 	
 	void setStatus( int newstatus );
+	
+	void process_data( std::vector<float> * parsed_data );
 	
 	void parse_data( int msgsize, std::vector<unsigned char> data );
 	void parse_trigger( int msgsize, std::vector<unsigned char> data );
@@ -160,7 +165,6 @@ namespace libminibee {
 // 	miniXBeeTXConnection * conTXStatus64;
 
 	int status; // current state of minibee
-	unsigned char id;    // node id of the minibee
 	unsigned char configid; // config id of the minibee
 	
 	int library_version;
@@ -170,7 +174,6 @@ namespace libminibee {
 	
 	unsigned char mymsgid;
 	
-	MiniBeeConfig * configuration;
   };
 };
 

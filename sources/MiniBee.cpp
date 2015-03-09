@@ -305,15 +305,10 @@ void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
       it++; it2++; it3++;
     }
   }
-    
-  if ( hive->oscServer != NULL ){
-    if ( configuration->getSamplesPerMessage() == 1 ){
-      hive->oscServer->sendOutputMessage( id, &parsed_data );
-    } else {
-      hive->oscServer->sendOutputBlockMessage( id, configuration->getSamplesPerMessage(), &parsed_data );
-    }
-  }
-//   int i = 0;
+  
+  this->process_data( &parsed_data );
+
+  //   int i = 0;
   std::ostringstream oss;
   oss << "Data minibee: " << id << " : ";
   for (auto n : parsed_data) {
@@ -322,6 +317,16 @@ void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
   }
   oss << std::endl;
   hive->writeToLog( 20, oss.str() );
+}
+
+void MiniXBee::process_data( std::vector<float> * parsed_data ){
+  if ( hive->oscServer != NULL ){
+    if ( configuration->getSamplesPerMessage() == 1 ){
+      hive->oscServer->sendOutputMessage( id, parsed_data );
+    } else {
+      hive->oscServer->sendOutputBlockMessage( id, configuration->getSamplesPerMessage(), parsed_data );
+    }
+  }
 }
 
 int MiniXBee::send_id_message(){

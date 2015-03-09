@@ -56,9 +56,11 @@ namespace libminibee {
       void handle_minihive_announce();
       
       void setHive( MiniXHive * inhive );
-      
-  private:
+
+// moved from private:      
     lo_address targetAddress;
+
+  private:
     MiniXHive * hive;
 
   // ----------- osc handlers ---------------
