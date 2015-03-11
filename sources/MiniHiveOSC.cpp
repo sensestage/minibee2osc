@@ -448,6 +448,10 @@ HiveOscServer::HiveOscServer( const char *port ) : NonBlockOSCServer( port )
   postDebug = false;
 }
 
+HiveOscServer::HiveOscServer( HiveOscServer * orig ) : NonBlockOSCServer( orig ){
+  postDebug = orig->postDebug;
+}
+
 void HiveOscServer::setHive(MiniXHive* inhive)
 {
   hive = inhive;

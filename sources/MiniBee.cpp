@@ -108,23 +108,23 @@ void MiniXBee::parseDataPacket( char type, int msgid, int msgsize, std::vector<u
 //       node ID + msg ID + N values
       
       oss << "minibee data message" << std::endl;
-      parse_data( msgsize, data );
-      setStatus( SENDING );
+      this->parse_data( msgsize, data );
+      this->setStatus( SENDING );
 //       status = SENDING;
       break;
     case MINIBEE_N_TRIGGER: // trigger data
 //       node ID + msg ID + N values
       oss << "minibee trigger message" << std::endl;
-      parse_trigger( msgsize, data );
+      this->parse_trigger( msgsize, data );
 //       status = SENDING;
-      setStatus( SENDING );
+      this->setStatus( SENDING );
       break;
     case MINIBEE_N_EXTRA: // extra data
 //       node ID + msg ID + N values
       oss << "minibee extra data message" << std::endl;
-      parse_extra( msgsize, data );
+      this->parse_extra( msgsize, data );
 //       status = SENDING;
-      setStatus( SENDING );
+      this->setStatus( SENDING );
       break;
     case MINIBEE_N_INFO:
       oss << "minibee info message" << std::endl;
@@ -132,38 +132,38 @@ void MiniXBee::parseDataPacket( char type, int msgid, int msgsize, std::vector<u
     case MINIBEE_N_SER: // serial number
       // Serial High (SH) + Serial Low (SL) + library version + board revision + capabilities
       oss << "minibee serial message" << std::endl;
-      parse_serial_message( msgsize, data );
+      this->parse_serial_message( msgsize, data );
       break;
     case MINIBEE_N_WAIT: // waiting
       //node ID + config ID
       oss << "minibee wait message" << std::endl;
       expected_config = data[3];
       if ( expected_config != configuration->getConfigID() ){
-	send_id_message();
+	this->send_id_message();
       } else {
-	send_config_message();
+	this->send_config_message();
       }
 //       status = WAIT_FORCONFIRM;
-      setStatus( WAIT_FORCONFIRM );
+      this->setStatus( WAIT_FORCONFIRM );
       break;
     case MINIBEE_N_CONF: // confirm config
       // node ID + config ID + smpMsg + msgInt + datasize + outsize + (*custom*) + customInputs + customDataSize + N x (custom pin, data size)
       oss << "minibee config message" << std::endl;
-      check_configuration_message( msgsize, data );
+      this->check_configuration_message( msgsize, data );
 //       status = WAIT_FORDATA;
-      setStatus( WAIT_FORDATA );
+      this->setStatus( WAIT_FORDATA );
       break;
     case MINIBEE_N_ACTIVE: // active
 //     node ID + msg ID
       oss << "minibee active message" << std::endl;
 //       status = ACTING;
-      setStatus( ACTING );
+      this->setStatus( ACTING );
       break;
     case MINIBEE_N_PAUSED: // pausing
 //       node ID + msg ID
       oss << "minibee pausing message" << std::endl;
 //       status = PAUSING;
-      setStatus( PAUSING );
+      this->setStatus( PAUSING );
       break;
   } 
   hive->writeToLog(10, oss.str() );
@@ -181,7 +181,7 @@ void MiniXBee::parse_serial_message( int msgsize, std::vector<unsigned char> dat
       addr64.addr64[i] = *it;
       ++it;
     }
-    parse_serial_message_noaddress( msgsize, data );
+    this->parse_serial_message_noaddress( msgsize, data );
   }
 }
 
@@ -192,10 +192,10 @@ void MiniXBee::parse_serial_message_noaddress( int msgsize, std::vector<unsigned
 	capabilities = data[12];
 	remote_config = data[13];
     }
-    set_remote_id();
-    send_id_message();
+    this->set_remote_id();
+    this->send_id_message();
 //     status = WAIT_FORCONFIG; 
-    setStatus( WAIT_FORCONFIG );
+    this->setStatus( WAIT_FORCONFIG );
 }
 
 
@@ -765,7 +765,7 @@ int MiniXBee::waitForPacket(){
 	    int msgsize = pkt.size();
 	    std::vector<unsigned char> data = pkt.getVector();
 // 	    std::cout << "packet 16 reaction: " << pkt.size() << std::endl;
-	    parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
 	  }
 	}
       } catch (xbee_err err) {
@@ -799,7 +799,7 @@ int MiniXBee::waitForPacket(){
 	    int msgid = (int) pkt[1];
 	    int msgsize = pkt.size();
 	    std::vector<unsigned char> data = pkt.getVector();
-	    parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
 // 	    std::cout << "packet 64 reaction: " << pkt.size() << std::endl;
 	  }
 	}

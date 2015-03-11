@@ -45,6 +45,7 @@ class NonBlockOSCServer
 
 public:
     NonBlockOSCServer( const char* port = "55000" );
+    NonBlockOSCServer( NonBlockOSCServer *orig );
     ~NonBlockOSCServer();
 
     int receive( int timeout );
@@ -62,7 +63,7 @@ public:
     void        removeMethod ( const char* path, const char* types );
     std::string getContent( const char* path, const char* types, lo_arg** argv, int argc, lo_address addr = NULL );
 
-    lo_server_thread serverThread;
+//     lo_server_thread serverThread;
     lo_server server;
 //     int port;
 

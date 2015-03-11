@@ -64,9 +64,9 @@ namespace libminibee {
 	int waitForOSC();
 
 	int createXBee( std::string serialport, int loglevel );
-	void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data );
-	void parseDataPacketCatchall( char type, int msgid, int msgsize, std::vector<unsigned char> data, struct xbee_conAddress *address );
-	int waitForPacket();
+	virtual void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data );
+	virtual void parseDataPacketCatchall( char type, int msgid, int msgsize, std::vector<unsigned char> data, struct xbee_conAddress *address );
+	virtual int waitForPacket();
 
 	// logging
 	void setLogLevel( int level );
@@ -87,28 +87,28 @@ namespace libminibee {
 	int send_save_id_to_minibee( int minibeeID );
 	int send_announce_to_minibee( int minibeeID );
 	
-	
-	
 	HiveOscServer * oscServer;
 
+    protected:
 	// moved from private
 	int numberOfBees;
 	int mymsgid;
 
-    private:
-      
-	MiniXBee * findMiniBeeByAddress( struct xbee_conAddress beeAddress );
-	MiniXBee * createNewMiniBee( struct xbee_conAddress beeAddress );
-	MiniXBee * createNewMiniBeeWithID( struct xbee_conAddress beeAddress );
-
-	libxbee::XBee * xbee;
-	std::map<int,MiniXBee*> minibees;
-	
 	libxbee::Con * con;
 // 	libxbee::Con * conTXStatus;
 	libxbee::Con * conCatchAll;
 	libxbee::Con * conCatchAll64;
-	
+	libxbee::XBee * xbee;
+
+	virtual void waitForBeePackets();
+
+  private:
+	MiniXBee * findMiniBeeByAddress( struct xbee_conAddress beeAddress );
+	MiniXBee * createNewMiniBee( struct xbee_conAddress beeAddress );
+	MiniXBee * createNewMiniBeeWithID( struct xbee_conAddress beeAddress );
+
+	std::map<int,MiniXBee*> minibees;
+
 	//TODO: catch-all connection to listen for all messages - test this!
 		
 // 	miniXHiveConnection * conData16;
