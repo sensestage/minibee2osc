@@ -102,6 +102,8 @@ namespace libminibee {
 
 	virtual void waitForBeePackets();
 
+	void addMinibee( int id, MiniXBee * mbee );
+
   private:
 	MiniXBee * findMiniBeeByAddress( struct xbee_conAddress beeAddress );
 	MiniXBee * createNewMiniBee( struct xbee_conAddress beeAddress );

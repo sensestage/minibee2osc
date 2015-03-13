@@ -424,6 +424,12 @@ MiniXBee * MiniXHive::createNewMiniBee( struct xbee_conAddress beeAddress ){
  return minibee;
 }
 
+void MiniXHive::addMinibee(int id, MiniXBee* mbee)
+{
+  minibees[ id ] = mbee;
+}
+
+
 MiniXBee * MiniXHive::createNewMiniBeeWithID( struct xbee_conAddress beeAddress ){
 //  numberOfBees++;
  int id = beeAddress.addr16[0]*256 + beeAddress.addr16[1];
