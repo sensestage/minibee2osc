@@ -54,6 +54,7 @@ public:
 
     int getPort();
 
+    void sendBundle( lo_address targ, lo_bundle bundle );
     void sendMessage( lo_address targ, const char *path, lo_message mess );
     void sendSimpleMessage( lo_address targ, const char *path );
     

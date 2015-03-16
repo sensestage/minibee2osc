@@ -69,6 +69,12 @@ int NonBlockOSCServer::getPort()
   return lo_server_get_port( server );
 }
 
+void NonBlockOSCServer::sendBundle(lo_address targ, lo_bundle bundle)
+{
+  lo_send_bundle_from( targ, server, bundle );
+}
+
+
 void NonBlockOSCServer::sendMessage( lo_address targ, const char *path, lo_message mess )
 {
   lo_send_message_from( targ, server, path, mess );

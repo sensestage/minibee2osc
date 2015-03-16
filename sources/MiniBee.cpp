@@ -215,7 +215,7 @@ void MiniXBee::parse_extra( int msgsize, std::vector<unsigned char> data ){
 
 }
 
-void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
+void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){  
   std::vector<float> parsed_data;
   // iterate over the dataBitSizes
   std::vector<unsigned char>::iterator itData = data.begin();
@@ -308,15 +308,17 @@ void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
   
   this->process_data( &parsed_data );
 
-  //   int i = 0;
-  std::ostringstream oss;
-  oss << "Data minibee: " << id << " : ";
-  for (auto n : parsed_data) {
-    oss << n << ", ";
-//     i++;
+  if ( hive->getLogLevel() > 0 ){  
+    //   int i = 0;
+    std::ostringstream oss;
+    oss << "Data minibee: " << id << " : ";
+    for (auto n : parsed_data) {
+      oss << n << ", ";
+  //     i++;
+    }
+    oss << std::endl;
+    hive->writeToLog( 20, oss.str() );
   }
-  oss << std::endl;
-  hive->writeToLog( 20, oss.str() );
 }
 
 void MiniXBee::process_data( std::vector<float> * parsed_data ){
@@ -706,6 +708,7 @@ void MiniXBee::setHive(MiniXHive * inhive)
 
 int MiniXBee::waitForPacket(){
   libxbee::Pkt pkt;
+  bool shouldLog = hive->getLogLevel() > 0;
 
 //   if ( con16TxStatus->RxAvailable() > 0 ){
 //     try {
@@ -753,10 +756,12 @@ int MiniXBee::waitForPacket(){
 	      return 1;
       }
       try {
-	std::ostringstream oss;
-	oss << "packet 16: " << pkt.size() << std::endl;
-	streamXBeePacket(&pkt, &oss );
-	hive->writeToLog( 10, oss.str() );
+	if ( shouldLog ){
+	  std::ostringstream oss;
+	  oss << "packet 16: " << pkt.size() << std::endl;
+	  streamXBeePacket(&pkt, &oss );
+	  hive->writeToLog( 10, oss.str() );
+	}
 // 	printXBeePacket( &pkt );    
 	if ( pkt.size() > 0) {
 	  if ( pkt.size() > 2) { // type and msg id
@@ -789,10 +794,12 @@ int MiniXBee::waitForPacket(){
 	return 1;
       }
       try {
-	std::ostringstream oss;
-	oss << "packet 64: " << pkt.size() << std::endl;
-	streamXBeePacket(&pkt, &oss );
-	hive->writeToLog( 10, oss.str() );
+	if ( shouldLog ){
+	  std::ostringstream oss;
+	  oss << "packet 64: " << pkt.size() << std::endl;
+	  streamXBeePacket(&pkt, &oss );
+	  hive->writeToLog( 10, oss.str() );
+	}
 	if ( pkt.size() > 0) {
 	  if ( pkt.size() > 2) { // type and msg id
 	    char type = pkt[0];
