@@ -45,7 +45,8 @@ namespace libminibee {
     WAIT_FORDATA,
     PAUSING,
     ACTING,
-    SENDING
+    SENDING,
+    OFF
   };
   
 //   class MiniXBee; // handles connections with XBee
@@ -120,6 +121,7 @@ namespace libminibee {
 
 
   protected:
+	int nodatacount;
 	// moved from private:
 	void initVariables();
 	MiniBeeConfig * configuration;

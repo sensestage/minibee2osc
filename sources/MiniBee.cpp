@@ -81,6 +81,9 @@ MiniXBee::MiniXBee( int newid ){
 
 void MiniXBee::initVariables(void)
 {
+  nodatacount = 0;
+  status = OFF;
+  
   memset(&addr16, 0, sizeof(addr16));
   addr16.addr16_enabled = 0;
   addr16.addr64_enabled = 0;
@@ -585,6 +588,9 @@ void MiniXBee::setStatus(int newstatus)
 	case SENDING:
 	  statusstring = std::string( "receiving" );
 	  break;
+	case OFF:
+	  statusstring = std::string( "off" );
+	  break;
       }
       hive->oscServer->sendStatusMessage( id, statusstring, newstatus );
     }
@@ -771,6 +777,7 @@ int MiniXBee::waitForPacket(){
 	    std::vector<unsigned char> data = pkt.getVector();
 // 	    std::cout << "packet 16 reaction: " << pkt.size() << std::endl;
 	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+	    nodatacount = 0;
 	  }
 	}
       } catch (xbee_err err) {
@@ -807,6 +814,7 @@ int MiniXBee::waitForPacket(){
 	    int msgsize = pkt.size();
 	    std::vector<unsigned char> data = pkt.getVector();
 	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+	    nodatacount = 0;
 // 	    std::cout << "packet 64 reaction: " << pkt.size() << std::endl;
 	  }
 	}
@@ -847,6 +855,11 @@ int MiniXBee::waitForPacket(){
 //       }
 //     }
 //   }
+
+  nodatacount++;
+  if ( nodatacount > 10000 ){ // 5 seconds
+      setStatus( OFF );
+  }
 }
 
 
