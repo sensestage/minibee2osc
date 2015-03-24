@@ -29,9 +29,6 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-
-
-
 ##########################################################################
 # Dependencies
 ##########################################################################
@@ -50,7 +47,7 @@ include_directories(
   ${CMAKE_BINARY_DIR}
   ${liblo_INCLUDE_DIRS}
 #   ${Boost_INCLUDE_DIRS}
-  headers/
+  include/
 )
 
 link_directories(
@@ -91,7 +88,9 @@ add_definitions("-std=c++11")
 # 
 # install(TARGETS xbee-osc DESTINATION bin)
 
-add_subdirectory (sources)
+add_subdirectory(sources)
+add_subdirectory(programs)
+add_subdirectory(external)
 
 
 ##########################################################################

@@ -35,10 +35,9 @@
  *                                                                                   *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "oscin.h"
+#include "osc/oscin.h"
 
 #include <sstream>
-
 
 NonBlockOSCServer::NonBlockOSCServer( const char* port )
 {
@@ -46,7 +45,11 @@ NonBlockOSCServer::NonBlockOSCServer( const char* port )
     if( server == NULL ){
         throw EServ();
     }
-// 	server = lo_server_thread_get_server( serverThread );
+}
+
+NonBlockOSCServer::NonBlockOSCServer( NonBlockOSCServer *orig )
+{
+  server = orig->server;  
 }
 
 
@@ -59,42 +62,18 @@ NonBlockOSCServer::~NonBlockOSCServer()
 
 int NonBlockOSCServer::receive( int timeout ){
    return lo_server_recv_noblock( server, timeout );
-
-  //   if ( server ){
-
-//   int retval;
-//   int lo_fd;
-//   fd_set rfds;
-//   /* get the file descriptor of the server socket, if supported */
-//   lo_fd = lo_server_get_socket_fd(server);
-//   if (lo_fd > 0) {
-//         /* select() on lo_server fd is supported, so we'll use select()
-//          * to watch both stdin and the lo_server fd. */
-// 	    FD_ZERO(&rfds);
-//             FD_SET(lo_fd, &rfds);
-//             retval = select(lo_fd + 1, &rfds, NULL, NULL, NULL);        /* no timeout */
-//             if (retval == -1) {
-//                 printf("select() error\n");
-// //                 exit(1);
-//             } else if (retval > 0) {
-//                 if (FD_ISSET(lo_fd, &rfds)) {
-//                     lo_server_recv_noblock(server, 0);
-//                 }
-//             }
-//     } else {
-//         /* lo_server protocol does not support select(), so we'll watch
-//          * stdin while polling the lo_server. */
-//        retval = lo_server_recv_noblock(server, 0);
-//     }
-//     return retval;
-// //     return lo_server_recv_noblock( server, timeout );
-// //   }
 }
 
 int NonBlockOSCServer::getPort()
 {
   return lo_server_get_port( server );
 }
+
+void NonBlockOSCServer::sendBundle(lo_address targ, lo_bundle bundle)
+{
+  lo_send_bundle_from( targ, server, bundle );
+}
+
 
 void NonBlockOSCServer::sendMessage( lo_address targ, const char *path, lo_message mess )
 {

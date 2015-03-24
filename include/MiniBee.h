@@ -45,7 +45,8 @@ namespace libminibee {
     WAIT_FORDATA,
     PAUSING,
     ACTING,
-    SENDING
+    SENDING,
+    OFF
   };
   
 //   class MiniXBee; // handles connections with XBee
@@ -88,10 +89,10 @@ namespace libminibee {
 	MiniXBee(int newid);
 	~MiniXBee(void);
 	
-	void setHive( MiniXHive * inhive );
+	virtual void setHive( MiniXHive * inhive );
 	
-	int waitForPacket();
-	void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data);
+	virtual int waitForPacket();
+	virtual void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data);
 
 	void createConnections( libxbee::XBee * xbee );
 	
@@ -117,17 +118,23 @@ namespace libminibee {
 	
 	int send_reset();
 	int send_save_id();
-	
 
-  private:
+
+  protected:
+	int nodatacount;
+	// moved from private:
 	void initVariables();
-	
+	MiniBeeConfig * configuration;
+	unsigned char id;    // node id of the minibee
+
 	void setStatus( int newstatus );
 	
-	void parse_data( int msgsize, std::vector<unsigned char> data );
-	void parse_trigger( int msgsize, std::vector<unsigned char> data );
-	void parse_extra( int msgsize, std::vector<unsigned char> data );
-	void parse_serial_message( int msgsize, std::vector<unsigned char> data );
+	virtual void process_data( std::vector<float> * parsed_data );
+	
+	virtual void parse_data( int msgsize, std::vector<unsigned char> data );
+	virtual void parse_trigger( int msgsize, std::vector<unsigned char> data );
+	virtual void parse_extra( int msgsize, std::vector<unsigned char> data );
+	virtual void parse_serial_message( int msgsize, std::vector<unsigned char> data );
 	int set_remote_id();
 	int send_id_message();
 	int send_config_message();
@@ -160,7 +167,6 @@ namespace libminibee {
 // 	miniXBeeTXConnection * conTXStatus64;
 
 	int status; // current state of minibee
-	unsigned char id;    // node id of the minibee
 	unsigned char configid; // config id of the minibee
 	
 	int library_version;
@@ -170,7 +176,6 @@ namespace libminibee {
 	
 	unsigned char mymsgid;
 	
-	MiniBeeConfig * configuration;
   };
 };
 

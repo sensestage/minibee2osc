@@ -19,6 +19,7 @@ namespace libminibee {
   class HiveOscServer : public NonBlockOSCServer {
   public:
       HiveOscServer( const char *port );
+      HiveOscServer( HiveOscServer *orig);
       ~HiveOscServer();
       void addBasicMethods();
       void debug( bool onoff );
@@ -56,9 +57,12 @@ namespace libminibee {
       void handle_minihive_announce();
       
       void setHive( MiniXHive * inhive );
-      
-  private:
+
+
+  protected:
+// moved from private:      
     lo_address targetAddress;
+
     MiniXHive * hive;
 
   // ----------- osc handlers ---------------

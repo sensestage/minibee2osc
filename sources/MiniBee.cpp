@@ -81,6 +81,9 @@ MiniXBee::MiniXBee( int newid ){
 
 void MiniXBee::initVariables(void)
 {
+  nodatacount = 0;
+  status = OFF;
+  
   memset(&addr16, 0, sizeof(addr16));
   addr16.addr16_enabled = 0;
   addr16.addr64_enabled = 0;
@@ -108,23 +111,23 @@ void MiniXBee::parseDataPacket( char type, int msgid, int msgsize, std::vector<u
 //       node ID + msg ID + N values
       
       oss << "minibee data message" << std::endl;
-      parse_data( msgsize, data );
-      setStatus( SENDING );
+      this->parse_data( msgsize, data );
+      this->setStatus( SENDING );
 //       status = SENDING;
       break;
     case MINIBEE_N_TRIGGER: // trigger data
 //       node ID + msg ID + N values
       oss << "minibee trigger message" << std::endl;
-      parse_trigger( msgsize, data );
+      this->parse_trigger( msgsize, data );
 //       status = SENDING;
-      setStatus( SENDING );
+      this->setStatus( SENDING );
       break;
     case MINIBEE_N_EXTRA: // extra data
 //       node ID + msg ID + N values
       oss << "minibee extra data message" << std::endl;
-      parse_extra( msgsize, data );
+      this->parse_extra( msgsize, data );
 //       status = SENDING;
-      setStatus( SENDING );
+      this->setStatus( SENDING );
       break;
     case MINIBEE_N_INFO:
       oss << "minibee info message" << std::endl;
@@ -132,38 +135,38 @@ void MiniXBee::parseDataPacket( char type, int msgid, int msgsize, std::vector<u
     case MINIBEE_N_SER: // serial number
       // Serial High (SH) + Serial Low (SL) + library version + board revision + capabilities
       oss << "minibee serial message" << std::endl;
-      parse_serial_message( msgsize, data );
+      this->parse_serial_message( msgsize, data );
       break;
     case MINIBEE_N_WAIT: // waiting
       //node ID + config ID
       oss << "minibee wait message" << std::endl;
       expected_config = data[3];
       if ( expected_config != configuration->getConfigID() ){
-	send_id_message();
+	this->send_id_message();
       } else {
-	send_config_message();
+	this->send_config_message();
       }
 //       status = WAIT_FORCONFIRM;
-      setStatus( WAIT_FORCONFIRM );
+      this->setStatus( WAIT_FORCONFIRM );
       break;
     case MINIBEE_N_CONF: // confirm config
       // node ID + config ID + smpMsg + msgInt + datasize + outsize + (*custom*) + customInputs + customDataSize + N x (custom pin, data size)
       oss << "minibee config message" << std::endl;
-      check_configuration_message( msgsize, data );
+      this->check_configuration_message( msgsize, data );
 //       status = WAIT_FORDATA;
-      setStatus( WAIT_FORDATA );
+      this->setStatus( WAIT_FORDATA );
       break;
     case MINIBEE_N_ACTIVE: // active
 //     node ID + msg ID
       oss << "minibee active message" << std::endl;
 //       status = ACTING;
-      setStatus( ACTING );
+      this->setStatus( ACTING );
       break;
     case MINIBEE_N_PAUSED: // pausing
 //       node ID + msg ID
       oss << "minibee pausing message" << std::endl;
 //       status = PAUSING;
-      setStatus( PAUSING );
+      this->setStatus( PAUSING );
       break;
   } 
   hive->writeToLog(10, oss.str() );
@@ -181,7 +184,7 @@ void MiniXBee::parse_serial_message( int msgsize, std::vector<unsigned char> dat
       addr64.addr64[i] = *it;
       ++it;
     }
-    parse_serial_message_noaddress( msgsize, data );
+    this->parse_serial_message_noaddress( msgsize, data );
   }
 }
 
@@ -192,10 +195,10 @@ void MiniXBee::parse_serial_message_noaddress( int msgsize, std::vector<unsigned
 	capabilities = data[12];
 	remote_config = data[13];
     }
-    set_remote_id();
-    send_id_message();
+    this->set_remote_id();
+    this->send_id_message();
 //     status = WAIT_FORCONFIG; 
-    setStatus( WAIT_FORCONFIG );
+    this->setStatus( WAIT_FORCONFIG );
 }
 
 
@@ -215,7 +218,7 @@ void MiniXBee::parse_extra( int msgsize, std::vector<unsigned char> data ){
 
 }
 
-void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
+void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){  
   std::vector<float> parsed_data;
   // iterate over the dataBitSizes
   std::vector<unsigned char>::iterator itData = data.begin();
@@ -305,23 +308,30 @@ void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
       it++; it2++; it3++;
     }
   }
-    
+  
+  this->process_data( &parsed_data );
+
+  if ( hive->getLogLevel() > 0 ){  
+    //   int i = 0;
+    std::ostringstream oss;
+    oss << "Data minibee: " << id << " : ";
+    for (auto n : parsed_data) {
+      oss << n << ", ";
+  //     i++;
+    }
+    oss << std::endl;
+    hive->writeToLog( 20, oss.str() );
+  }
+}
+
+void MiniXBee::process_data( std::vector<float> * parsed_data ){
   if ( hive->oscServer != NULL ){
     if ( configuration->getSamplesPerMessage() == 1 ){
-      hive->oscServer->sendOutputMessage( id, &parsed_data );
+      hive->oscServer->sendOutputMessage( id, parsed_data );
     } else {
-      hive->oscServer->sendOutputBlockMessage( id, configuration->getSamplesPerMessage(), &parsed_data );
+      hive->oscServer->sendOutputBlockMessage( id, configuration->getSamplesPerMessage(), parsed_data );
     }
   }
-//   int i = 0;
-  std::ostringstream oss;
-  oss << "Data minibee: " << id << " : ";
-  for (auto n : parsed_data) {
-    oss << n << ", ";
-//     i++;
-  }
-  oss << std::endl;
-  hive->writeToLog( 20, oss.str() );
 }
 
 int MiniXBee::send_id_message(){
@@ -578,6 +588,9 @@ void MiniXBee::setStatus(int newstatus)
 	case SENDING:
 	  statusstring = std::string( "receiving" );
 	  break;
+	case OFF:
+	  statusstring = std::string( "off" );
+	  break;
       }
       hive->oscServer->sendStatusMessage( id, statusstring, newstatus );
     }
@@ -701,6 +714,7 @@ void MiniXBee::setHive(MiniXHive * inhive)
 
 int MiniXBee::waitForPacket(){
   libxbee::Pkt pkt;
+  bool shouldLog = hive->getLogLevel() > 0;
 
 //   if ( con16TxStatus->RxAvailable() > 0 ){
 //     try {
@@ -748,10 +762,12 @@ int MiniXBee::waitForPacket(){
 	      return 1;
       }
       try {
-	std::ostringstream oss;
-	oss << "packet 16: " << pkt.size() << std::endl;
-	streamXBeePacket(&pkt, &oss );
-	hive->writeToLog( 10, oss.str() );
+	if ( shouldLog ){
+	  std::ostringstream oss;
+	  oss << "packet 16: " << pkt.size() << std::endl;
+	  streamXBeePacket(&pkt, &oss );
+	  hive->writeToLog( 10, oss.str() );
+	}
 // 	printXBeePacket( &pkt );    
 	if ( pkt.size() > 0) {
 	  if ( pkt.size() > 2) { // type and msg id
@@ -760,7 +776,8 @@ int MiniXBee::waitForPacket(){
 	    int msgsize = pkt.size();
 	    std::vector<unsigned char> data = pkt.getVector();
 // 	    std::cout << "packet 16 reaction: " << pkt.size() << std::endl;
-	    parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+	    nodatacount = 0;
 	  }
 	}
       } catch (xbee_err err) {
@@ -784,17 +801,20 @@ int MiniXBee::waitForPacket(){
 	return 1;
       }
       try {
-	std::ostringstream oss;
-	oss << "packet 64: " << pkt.size() << std::endl;
-	streamXBeePacket(&pkt, &oss );
-	hive->writeToLog( 10, oss.str() );
+	if ( shouldLog ){
+	  std::ostringstream oss;
+	  oss << "packet 64: " << pkt.size() << std::endl;
+	  streamXBeePacket(&pkt, &oss );
+	  hive->writeToLog( 10, oss.str() );
+	}
 	if ( pkt.size() > 0) {
 	  if ( pkt.size() > 2) { // type and msg id
 	    char type = pkt[0];
 	    int msgid = (int) pkt[1];
 	    int msgsize = pkt.size();
 	    std::vector<unsigned char> data = pkt.getVector();
-	    parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+	    nodatacount = 0;
 // 	    std::cout << "packet 64 reaction: " << pkt.size() << std::endl;
 	  }
 	}
@@ -835,6 +855,11 @@ int MiniXBee::waitForPacket(){
 //       }
 //     }
 //   }
+
+  nodatacount++;
+  if ( nodatacount > 10000 ){ // 5 seconds
+      setStatus( OFF );
+  }
 }
 
 

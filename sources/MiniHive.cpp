@@ -165,7 +165,7 @@ int MiniXHive::waitForPacket(){
 	    int msgid = (int) pkt[1];
 	    int msgsize = pkt.size();
 	    std::vector<unsigned char> data = pkt.getVector();
-	    parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
 	}
     } catch (xbee_err err) {
       std::ostringstream oss;
@@ -195,7 +195,7 @@ int MiniXHive::waitForPacket(){
 	    int msgid = (int) pkt[1];
 	    int msgsize = pkt.size();
 	    std::vector<unsigned char> data = pkt.getVector();
-	    parseDataPacketCatchall( type, msgid, pkt.size(), pkt.getVector(), &(pkthandle->address) );
+	    this->parseDataPacketCatchall( type, msgid, pkt.size(), pkt.getVector(), &(pkthandle->address) );
 	}
     } catch (xbee_err err) {
       std::ostringstream oss;
@@ -228,7 +228,7 @@ int MiniXHive::waitForPacket(){
 	    int msgid = (int) pkt[1];
 	    int msgsize = pkt.size();
 	    std::vector<unsigned char> data = pkt.getVector();
-	    parseDataPacketCatchall( type, msgid, pkt.size(), pkt.getVector(), &(pkthandle->address) );
+	    this->parseDataPacketCatchall( type, msgid, pkt.size(), pkt.getVector(), &(pkthandle->address) );
 	}
     } catch (xbee_err err) {
       std::ostringstream oss;
@@ -253,6 +253,10 @@ int MiniXHive::waitForPacket(){
 //     }
 //   }
 
+  this->waitForBeePackets();
+}
+
+void MiniXHive::waitForBeePackets(){
   std::map<int,MiniXBee*>::iterator beeIt;
 //   std::cout << "packets from minibees: " << minibees.size() << std::endl;
   for ( beeIt = minibees.begin(); beeIt != minibees.end(); ++beeIt ){
@@ -260,8 +264,7 @@ int MiniXHive::waitForPacket(){
     if ( minibee != NULL ){
       minibee->waitForPacket();
     }
-  }
-
+  }  
 }
 
 void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data ){
@@ -420,6 +423,12 @@ MiniXBee * MiniXHive::createNewMiniBee( struct xbee_conAddress beeAddress ){
 
  return minibee;
 }
+
+void MiniXHive::addMinibee(int id, MiniXBee* mbee)
+{
+  minibees[ id ] = mbee;
+}
+
 
 MiniXBee * MiniXHive::createNewMiniBeeWithID( struct xbee_conAddress beeAddress ){
 //  numberOfBees++;
