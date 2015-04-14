@@ -13,6 +13,7 @@ set(minibee_osc_lib_SRCS
   MiniBee.cpp
   MiniHive.cpp
   MiniBeeConfig.cpp
+  MiniBeeConfigFile.cpp
   minibee_utils.cpp
   MiniHiveOSC.cpp
   osc/lo_extensions.cpp

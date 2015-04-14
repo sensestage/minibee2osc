@@ -560,12 +560,26 @@ MiniBeeConfig * MiniXBee::getConfiguration(){
     return configuration;
 }
 
+void MiniXBee::setSerialNumber( std::string newserial ){
+    serial_number = newserial;
+}
+
+void MiniXBee::setName( std::string newname ){
+  name = newname;
+}
+
 void MiniXBee::setID( int newid ){
     id = newid;
 }
 
 void MiniXBee::setConfigID( int newid ){
     configid = newid;
+}
+
+void MiniXBee::setProperties( char rev, int libv, int caps ){
+    board_revision = rev;
+    library_version = libv;
+    capabilities = caps;
 }
 
 void MiniXBee::setStatus(int newstatus)

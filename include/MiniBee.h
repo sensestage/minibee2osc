@@ -18,10 +18,12 @@
 // #define XBEE_EXPORT_DEFINED
 // #endif
 
+#include "MiniBeeConfig.h"
+
+#include <string.h>
 #include <vector>
 #include <lo/lo_osc_types.h>
 
-#include "MiniBeeConfig.h"
 
 
 //node message types
@@ -99,8 +101,12 @@ namespace libminibee {
 	void setConfiguration( MiniBeeConfig * conf );
 	MiniBeeConfig * getConfiguration();
 	
+	void setSerialNumber( std::string newserial );
+	void setName( std::string newname );
 	void setID( int newid );
 	void setConfigID( int newid );
+	void setProperties( char rev, int libv, int caps );
+	
 	bool set16bitAddress( struct xbee_conAddress xbaddr, libxbee::XBee * xbee ); // returns false when not a valid address
 	bool set64bitAddress( struct xbee_conAddress xbaddr, libxbee::XBee * xbee ); // returns false when not a valid address
 	
@@ -169,8 +175,10 @@ namespace libminibee {
 	int status; // current state of minibee
 	unsigned char configid; // config id of the minibee
 	
+	std::string serial_number;
+	std::string name;
 	int library_version;
-	int board_revision;
+	char board_revision;
 	int capabilities;
 	int remote_config;
 	

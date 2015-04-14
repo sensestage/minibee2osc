@@ -6,6 +6,7 @@
 #else
 
 #include <vector>
+#include <string>
 
 namespace libminibee {
   
@@ -63,18 +64,40 @@ namespace libminibee {
       unsigned char getConfigID();
       
       int getSamplesPerMessage();
+      int getRedundancy();
+      bool getSendRSSI();
+      
+      void setProperties( unsigned char id, int spm, int red, bool rssi, std::string newname );
+      
+      void addPinConfig( int id, unsigned char config );
+      void addTWIConfig( int id, unsigned char config );
+      void addCustomConfig( int id, int offset, int scale, unsigned char size );
+      
+      void setNumberOfTWIs( int no );
+      void setNumberOfCustomInputs( int no );
 
     private:
       int msgTimeInterval;
       int samplesPerMessage;
+      int redundancy;
+      
+      std::string name;
+      bool sendRSSI;
       
       unsigned char numberOfCustomInputs;
+      
+//       std::vector<MiniBeeDataPoint> customPoints;
+      // this should be a struct
       unsigned char * customInputSizes;
       unsigned char * customInputPins;
+      int * customInputOffsets;
+      int * customInputScales;
       
       unsigned char pinConfig[19];
+      
       unsigned char numberOfTWIs;
       unsigned char * twiConfig;
+      
       unsigned char configid; // config id of the minibee
       
   };
