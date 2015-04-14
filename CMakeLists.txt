@@ -22,6 +22,10 @@ pkg_check_modules(liblo REQUIRED liblo)
 # libxbee
 find_package(LibXBee)
 
+# tinyxml2
+find_package(TinyXML2)
+
+
 # Set up compiler flags
 
 #set the default path for built executables to the "bin" directory
@@ -46,6 +50,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 include_directories(
   ${CMAKE_BINARY_DIR}
   ${liblo_INCLUDE_DIRS}
+  ${TINYXML2_INCLUDE_DIR}
 #   ${Boost_INCLUDE_DIRS}
   include/
 )
@@ -53,6 +58,7 @@ include_directories(
 link_directories(
   ${liblo_LIBRARY_DIRS}
   ${libxbee_LIBRARY_DIRS}
+#   ${TINYXML2_LIBRARY}
 #   ${Boost_LIBRARY_DIRS}
   ${CMAKE_BINARY_DIR}
 #   lib/
@@ -90,7 +96,9 @@ add_definitions("-std=c++11")
 
 add_subdirectory(sources)
 add_subdirectory(programs)
-add_subdirectory(external)
+# add_subdirectory(external)
+
+add_subdirectory(tests/xml)
 
 
 ##########################################################################

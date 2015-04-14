@@ -1,0 +1,45 @@
+<xml><hive name="myprojectname">
+
+  <configuration id="1" name="accelero" message_interval="50" samples_per_message="1">
+    <pin config="TWIData" id="A4" />
+    <pin config="TWIClock" id="A5" />
+    <twi id="1" device="ADXL345" name="accelero" />
+  </configuration>
+  
+  <configuration id="2" name="expee" message_interval="50" samples_per_message="1">
+    <pin config="TWIData" id="A4" />
+    <pin config="TWIClock" id="A5" />
+    <pin config="AnalogIn10bit" id="A0"  name="analog0" />
+    <pin config="AnalogIn10bit" id="A1"  name="analog1" />
+    <pin config="AnalogIn10bit" id="A2"  name="analog2" />
+    <pin config="AnalogIn10bit" id="A3"  name="analog3" />
+    <pin config="AnalogOut" id="D9" name="led0" />
+    <pin config="AnalogOut" id="D10" name="led1" />
+    <pin config="AnalogOut" id="D11" name="led2" />
+    <pin config="AnalogOut" id="D3" name="led3" />
+    <pin config="AnalogOut" id="D5" name="led4" />
+    <pin config="AnalogOut" id="D6" name="led5" />
+    <twi id="1" device="ADXL345" name="accelero" />
+  </configuration>
+
+  <configuration id="3" name="expree" message_interval="50" samples_per_message="1">
+    <pin config="TWIData" id="A4" />
+    <pin config="TWIClock" id="A5" />
+    <pin config="AnalogIn10bit" id="A0"  name="analog0" />
+    <pin config="AnalogIn10bit" id="A1"  name="analog1" />
+    <pin config="AnalogIn10bit" id="A2"  name="analog2" />
+    <pin config="AnalogIn10bit" id="A3"  name="analog3" />
+    <pin config="AnalogIn10bit" id="A6"  name="analog4" />
+    <pin config="AnalogIn10bit" id="A7"  name="analog5" />
+    <pin config="DigitalIn" id="D3" name="digitaal0" />
+    <pin config="DigitalIn" id="D5" name="digitaal1" />
+    <pin config="DigitalIn" id="D6" name="digitaal2" />
+    <pin config="DigitalIn" id="D7" name="digitaal3" />
+    <pin config="DigitalIn" id="D8" name="digitaal4" />
+    <pin config="DigitalIn" id="D9" name="digitaal5" />
+    <pin config="DigitalIn" id="D10" name="digitaal6" />
+    <pin config="DigitalIn" id="D11" name="digitaal7" />
+    <twi id="1" device="ADXL345" name="accelero" />
+  </configuration>
+
+</hive></xml>
