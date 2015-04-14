@@ -103,6 +103,7 @@ namespace libminibee {
 	
 	void setSerialNumber( std::string newserial );
 	void setName( std::string newname );
+	int getID();
 	void setID( int newid );
 	void setConfigID( int newid );
 	void setProperties( char rev, int libv, int caps );

@@ -22,6 +22,6 @@ set(minibee_osc_lib_SRCS
 
 add_library( sensestage ${minibee_osc_lib_SRCS})
 
-target_link_libraries( sensestage ${LIBXBEEP_LIBRARIES} ${LIBXBEE_LIBRARIES} ${liblo_LIBRARIES} )
+target_link_libraries( sensestage ${LIBXBEEP_LIBRARIES} ${LIBXBEE_LIBRARIES} ${liblo_LIBRARIES} ${TINYXML2_LIBRARY})
 
 install(TARGETS sensestage DESTINATION lib)

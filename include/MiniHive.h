@@ -19,6 +19,8 @@
 #include "MiniBee.h"
 #include "osc/oscin.h"
 
+#include "MiniBeeConfigFile.h"
+
 #include <map>
 
 // #ifndef EXPORT
@@ -58,6 +60,8 @@ namespace libminibee {
     public:
 	MiniXHive(void);
 	~MiniXHive(void);
+	
+	int readConfigurationFile( const char* filename );
 
 	int createOSCServer( const char * port );
 	int setTargetAddress( const char * host, const char * port );
@@ -91,7 +95,7 @@ namespace libminibee {
 
     protected:
 	// moved from private
-	int numberOfBees;
+// 	int numberOfBees;
 	int mymsgid;
 
 	libxbee::Con * con;
@@ -110,6 +114,9 @@ namespace libminibee {
 	MiniXBee * createNewMiniBeeWithID( struct xbee_conAddress beeAddress );
 
 	std::map<int,MiniXBee*> minibees;
+	
+	MiniBeeConfigFile * configFile;
+	MiniBeeIDAllocator * idAllocator;
 
 	//TODO: catch-all connection to listen for all messages - test this!
 		

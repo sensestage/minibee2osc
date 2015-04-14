@@ -24,7 +24,6 @@ MiniBeeDataPoint::~MiniBeeDataPoint(){
 }
 
 MiniBeeConfig::MiniBeeConfig(){
-  //FIXME: these are all defaults
   configid = 1;
   msgTimeInterval = 50;
   samplesPerMessage = 1;
@@ -34,23 +33,7 @@ MiniBeeConfig::MiniBeeConfig(){
   }
   
   numberOfTWIs = 0;
-//   if ( numberOfTWIs > 0 ){
-//     pinConfig[14] = TWIData; // A4 : 13 + 4 = 17 -> 14
-//     pinConfig[15] = TWIClock; // A5
-//     twiConfig = (unsigned char*) malloc(numberOfTWIs * sizeof( unsigned char ) );
-//     twiConfig[0] = TWI_ADXL345; //FIXME: a default!
-//   }
-
   numberOfCustomInputs = 0;
-
-//   if ( numberOfCustomInputs > 0 ){
-//     customInputSizes = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
-//     customInputPins = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
-//     customInputSizes[0] = 1; //FIXME: a default!
-//     customInputPins[0] = 0;  //FIXME: a default!
-//   }
-  // deal with custom pins
-  
   calcDataProperties();
 }
 

@@ -116,9 +116,13 @@ std::map<std::string,int> MiniBeeConfigFile::TWINames = {
 
 
 MiniBeeConfigFile::MiniBeeConfigFile(void){
+  doc = NULL;
 }
 
 MiniBeeConfigFile::~MiniBeeConfigFile(void){
+  if ( doc != NULL ){
+    delete doc;
+  }
 }
 
 int MiniBeeConfigFile::load( const char *filename ){ // success or not
@@ -229,7 +233,7 @@ void MiniBeeConfigFile::readConfigurationElement( const XMLElement * ele, MiniBe
 //      std::string customLabel = std::string( subnode->Attribute( "name" ) ); // FIXME
       }
   }
-  
+  config->calcDataProperties();
 }
 
 int MiniBeeConfigFile::readConfigurationWithID( int id, MiniBeeConfig * config ){
@@ -299,9 +303,12 @@ int MiniBeeConfigFile::readMiniBeeWithID( int id, MiniXBee * bee ){
 }
 
 int MiniBeeConfigFile::readMiniBeeWithSerialNumber( std::string serialnumber, MiniXBee * bee ){
+    std::transform(serialnumber.begin(), serialnumber.end(),serialnumber.begin(), ::toupper);
+  
     for( const XMLElement* node=hiveroot->FirstChildElement( "minibee" ); node; node=node->NextSiblingElement( "minibee" ) ) {
 	  const char* text = node->Attribute( "serial" );
 // 	  printf( "\tserial: %s, %i\n", text, serialnumber.compare( text ) );
+// 	  std::string str = std::string( text );
 	  if ( serialnumber.compare( text ) == 0 ){
     	    readMiniBeeElement( node, bee );
 	    return 1;

@@ -89,7 +89,7 @@ namespace libminibee {
 //       std::vector<MiniBeeDataPoint> customPoints;
       // this should be a struct
       unsigned char * customInputSizes;
-      unsigned char * customInputPins;
+//       unsigned char * customInputPins;
       int * customInputOffsets;
       int * customInputScales;
       

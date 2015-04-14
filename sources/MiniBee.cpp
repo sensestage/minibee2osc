@@ -572,6 +572,11 @@ void MiniXBee::setID( int newid ){
     id = newid;
 }
 
+int MiniXBee::getID()
+{
+  return id;
+}
+
 void MiniXBee::setConfigID( int newid ){
     configid = newid;
 }

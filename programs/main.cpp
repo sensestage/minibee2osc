@@ -71,30 +71,35 @@ void mainConnection::xbee_conCallback(libxbee::Pkt **pkt) {
 
 int main(int argc, char *argv[]) {
 	int ret, res;
+	const char * filename = "example_hiveconfig.xml";
 	const char * serialport = "/dev/ttyUSB1";
 	const char * targetip = "127.0.0.1";
 	const char * targetport = "57120";
 	const char * listenport = "57600";
 	int loglevel = 0;
-	// 1: serialport, 2: listenport, 3: sendport, 4: sendip, 5: loglevel
+// 	// 1: filename, 2: serialport, 3: listenport, 4: sendport, 5: sendip, 6: loglevel
+	if ( argc > 6 ){
+	    loglevel = atoi( argv[6] );
+	}
 	if ( argc > 5 ){
-	    loglevel = atoi( argv[5] );
+	  targetip = argv[5];
 	}
 	if ( argc > 4 ){
-	  targetip = argv[4];
+	  targetport = argv[4];
 	}
 	if ( argc > 3 ){
-	  targetport = argv[3];
+	  listenport = argv[3];
 	}
 	if ( argc > 2 ){
-	  listenport = argv[2];
+	  serialport = argv[2];
 	}
 	if ( argc > 1 ){
-	  serialport = argv[1];
+	  filename = argv[1];
 	}
 	
 	std::cout << "=============================================================" << std::endl;
 	std::cout << "XBee to OSC" << std::endl;
+	std::cout << "filename: " << filename << std::endl;
 	std::cout << "serial port: " << serialport << std::endl;
 	std::cout << "listening port: " << listenport << std::endl;
 	std::cout << "target ip: " << targetip << ", target port: " << targetport << std::endl;
@@ -110,6 +115,8 @@ int main(int argc, char *argv[]) {
 
 	if ( ret == 0 ){
 	  std::cout << "Opened connection...\n";
+
+	  hive->readConfigurationFile( filename );
 
 	  hive->createOSCServer(listenport);
 	  hive->setTargetAddress( targetip, targetport );
