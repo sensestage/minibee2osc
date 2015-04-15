@@ -6,6 +6,7 @@
 #include <xbeep.h>
 #include "MiniHive.h"
 
+#include <getopt.h>
 
 /* ========================================================================== */
 
@@ -77,25 +78,85 @@ int main(int argc, char *argv[]) {
 	const char * targetport = "57120";
 	const char * listenport = "57600";
 	int loglevel = 0;
-// 	// 1: filename, 2: serialport, 3: listenport, 4: sendport, 5: sendip, 6: loglevel
-	if ( argc > 6 ){
-	    loglevel = atoi( argv[6] );
-	}
-	if ( argc > 5 ){
-	  targetip = argv[5];
-	}
-	if ( argc > 4 ){
-	  targetport = argv[4];
-	}
-	if ( argc > 3 ){
-	  listenport = argv[3];
-	}
-	if ( argc > 2 ){
-	  serialport = argv[2];
-	}
-	if ( argc > 1 ){
-	  filename = argv[1];
-	}
+
+    int c;
+    int digit_optind = 0;
+
+    while (1) {
+        int this_option_optind = optind ? optind : 1;
+        int option_index = 0;
+        static struct option long_options[] = {
+            {"configfile", required_argument, 0,  0 },
+            {"serialport", required_argument, 0,  0 },
+            {"listenport", no_argument,       0,  0 },
+            {"targetport", no_argument,       0,  0 },
+            {"targetip",   no_argument,       0,  0 },
+            {"loglevel",   no_argument,       0,  0 },
+	    {"help",   no_argument,       0,  0 },
+            {0,            0,             0,  0 }
+        };
+
+       c = getopt_long(argc, argv, "c:s:l:p:i:v:h", long_options, &option_index);
+       if (c == -1)
+            break;
+
+       switch (c) {
+        case 0:
+            printf("option %s", long_options[option_index].name);
+            if (optarg)
+                printf(" with arg %s", optarg);
+            printf("\n");
+            break;
+	case 'c':
+	    filename = optarg;
+//             printf("option c with value '%s'\n", optarg);
+            break;
+
+	case 's':
+	    serialport = optarg;
+//             printf("option s with value '%s'\n", optarg);
+            break;
+
+	case 'l':
+	    listenport = optarg;
+//             printf("option l with value '%s'\n", optarg);
+            break;
+
+	case 'p':
+	    targetport = optarg;
+//             printf("option p with value '%s'\n", optarg);
+            break;
+
+	case 'i':
+	    targetip = optarg;
+//             printf("option i with value '%s'\n", optarg);
+            break;
+
+	case 'v':
+	    loglevel = atoi( optarg );
+//             printf("option v with value '%s'\n", optarg);
+            break;
+
+	case 'h':
+	    printf("option help\n");
+            break;
+
+	case '?':
+// 	    printf("getopt returned ?\n");
+            break;
+
+// 	default:
+//             printf("?? getopt returned character code 0%o ??\n", c);
+        }
+    }
+
+   if (optind < argc) {
+        printf("non-option ARGV-elements: ");
+        while (optind < argc)
+            printf("%s ", argv[optind++]);
+        printf("\n");
+    }
+	
 	
 	std::cout << "=============================================================" << std::endl;
 	std::cout << "XBee to OSC" << std::endl;
