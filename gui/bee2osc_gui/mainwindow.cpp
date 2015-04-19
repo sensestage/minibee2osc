@@ -76,7 +76,7 @@ void MainWindow::on_pushButton_start_clicked()
         ui->groupBox_verbosity->setVisible(false);
         ui->groupBox->setVisible(false);
 
-        QString program = "/home/nescivi/git/ssdn/minibee2osc/bin/minibee2osc";
+        QString program = "minibee2osc";
         QStringList arguments;
         arguments << "-c" << configfile << "-s" << serialport << "-i" << targethost << "-p" << targethostport << "-l" << myport << "-v" << QString::number(verbosity);
 
