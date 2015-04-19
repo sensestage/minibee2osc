@@ -218,6 +218,8 @@ void MiniXBee::parse_extra( int msgsize, std::vector<unsigned char> data ){
 
 }
 
+#define TAKE_N_BITS_FROM(b, p, n) ((b) >> (p)) & ((1 << (n)) - 1)
+  
 void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){  
   std::vector<float> parsed_data;
   // iterate over the dataBitSizes
@@ -229,10 +231,11 @@ void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
     std::vector<int>::iterator it2 = configuration->dataScales.begin();
     std::vector<int>::iterator it3 = configuration->dataOffsets.begin();
     // TODO parse data
-    unsigned char curData = *itData;
+    unsigned char curData = (*itData);
+    int byteIndex = 0;
     int curBitSize = 0;
     int curBitIndex = 0;
-    unsigned char curBitMask;
+//     unsigned char curBitMask;
     float newdata;
     bool prev1bit = false;
     while ( it != configuration->dataBitSizes.end() ){
@@ -240,18 +243,20 @@ void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
       curBitSize = (*it);
       if ( curBitSize == 1 ){ // FIXME: this does not work correctly yet
 	prev1bit = true;
-	if ( curData & curBitMask ){
-	  newdata = 1;
-	} else {
-	  newdata = 0;
-	}
+	unsigned char myData = curData;
+	newdata = TAKE_N_BITS_FROM( myData, curBitIndex, curBitSize );
+// 	if ( curData & curBitMask ){
+// 	  newdata = 1;
+// 	} else {
+// 	  newdata = 0;
+// 	}
 	newdata = ( (float) newdata + (*it3) / (*it2) );
 	parsed_data.push_back(newdata);
 	curBitIndex++;
-	curBitMask << 1;
+// 	curBitMask << 1;
 	if ( curBitIndex == 8 ){
 	    prev1bit = false;
-	    itData++;
+	    itData++; byteIndex++;
 	    curData = *itData;
 	    if ( itData == data.end() ){
 	      std::ostringstream oss;
@@ -260,47 +265,49 @@ void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
 	      break;
 	    }
 	    curBitIndex = 0;
-	    curBitMask = 1;
+// 	    curBitMask = 1;
 	}
       } else { // other options are 8, 16, 24 bit for now
 	if ( prev1bit ){
 	  prev1bit = false;
-	  itData++;
+	  curBitIndex = 0;
+	  itData++; byteIndex++;
 	  if ( itData == data.end() ){
 	      std::ostringstream oss;
 	      oss << "Data too short! Early return from data!" << std::endl;
 	      hive->writeToLog( 2, oss.str() );
 	      break;
 	  }
+	  curData = *itData;
 	}
 	switch( curBitSize ){
 	  case 8:
 	    newdata = ( (float) curData + (*it3) )/ (float) (*it2);
 	    parsed_data.push_back(newdata);
-	    itData++;
+	    itData++; byteIndex++;
 	    curData = *itData;
 	    break;
 	  case 16:
 	    newdata = (float) curData * 256.;
-	    itData++;
+	    itData++; byteIndex++;
 	    curData = *itData;
 	    newdata += (float) curData;
 	    newdata = (float) (newdata + (*it3)) / (float) (*it2 );
 	    parsed_data.push_back(newdata);
-	    itData++;
+	    itData++; byteIndex++;
 	    curData = *itData;
 	    break;
 	  case 24:
 	    newdata = (float) curData * 256. * 256.;
-	    itData++;
+	    itData++; byteIndex++;
 	    curData = *itData;
 	    newdata += (float) curData * 256.;
-	    itData++;
+	    itData++; byteIndex++;
 	    curData = *itData;
 	    newdata += (float) curData;
 	    newdata = (newdata + (float) (*it3)) / (float) (*it2 );
 	    parsed_data.push_back(newdata);
-	    itData++;
+	    itData++; byteIndex++;
 	    curData = *itData;
 	    break;
 	}
