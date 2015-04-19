@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QProcess>
 
+//#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
+
+
 namespace Ui {
 class MainWindow;
 }
@@ -15,6 +19,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    void saveSettings( QString * filename );
+    void loadSettings( QString * filename );
 
 private slots:
     void on_pushButton_start_clicked();
@@ -28,14 +35,23 @@ private slots:
 
     void on_pushButton_2_clicked();
 
-    void on_pushButton_clicked();
+//    void on_pushButton_clicked();
 
     void on_pushButton_3_clicked();
 
+    void on_pushButton_updateSerial_clicked();
+
+    void on_actionSave_triggered();
+
+    void on_actionLoad_triggered();
+
 private:
+
     Ui::MainWindow *ui;
 
+    bool processStarted;
     QProcess *myProcess;
+    QList<QSerialPortInfo> *filteredPorts;
 };
 
 #endif // MAINWINDOW_H

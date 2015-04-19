@@ -8,6 +8,8 @@
 
 #include <getopt.h>
 
+#include <signal.h>
+
 /* ========================================================================== */
 
 /*
@@ -67,6 +69,14 @@ void mainConnection::xbee_conCallback(libxbee::Pkt **pkt) {
 
 }
 */
+
+
+volatile sig_atomic_t done = 0;
+ 
+void term(int signum)
+{
+    done = 1;
+}
 
 /* ========================================================================== */
 
@@ -159,11 +169,11 @@ int main(int argc, char *argv[]) {
 	
 	
 	std::cout << "=============================================================" << std::endl;
-	std::cout << "XBee to OSC" << std::endl;
-	std::cout << "filename: " << filename << std::endl;
+	std::cout << "Minibee to OSC" << std::endl;
+	std::cout << "configuration file: " << filename << std::endl;
 	std::cout << "serial port: " << serialport << std::endl;
-	std::cout << "listening port: " << listenport << std::endl;
-	std::cout << "target ip: " << targetip << ", target port: " << targetport << std::endl;
+	std::cout << "OSC listening port: " << listenport << std::endl;
+	std::cout << "OSC target ip: " << targetip << ", target port: " << targetport << std::endl;
 	std::cout << "loglevel: " << loglevel << std::endl;
 	std::cout << "=============================================================" << std::endl;
 	
@@ -178,23 +188,38 @@ int main(int argc, char *argv[]) {
 	  std::cout << "Opened connection...\n";
 
 	  hive->readConfigurationFile( filename );
+	  std::cout << "Read configuration file...\n";
 
 	  hive->createOSCServer(listenport);
 	  hive->setTargetAddress( targetip, targetport );
+	  std::cout << "Created OSC interface...\n";
 	  
 	  if ( loglevel > 0 ){
 	    hive->oscServer->debug(true);
 	  }
 	  
-	  while ( true ){
+	  struct sigaction action;
+	  memset(&action, 0, sizeof(struct sigaction));
+	  action.sa_handler = term;
+	  sigaction(SIGTERM, &action, NULL);
+	  
+	  char s[10];
+	  while ( !done ){
 	    hive->waitForPacket();
 	    res = hive->waitForOSC();
 // 	    std::cout << "Number of received OSC messages: " << res << std::endl;
+	    std::cin.getline(s,10);
+// 	    std::cout << "input: " << s << "\n";
+	    if(strcmp(s,"quit")==0){ 
+	      std::cout << "Got request to quit!\n";
+	      done = 1; 	      
+	    }
 	    usleep(500);
   // 		  usleep(60000000);
 	  }
 
-	  std::cout << "Closing connection...\n";
+	  std::cout << "Exiting minibee2osc...\n";
+	  std::cout << "=============================================================" << std::endl;
 	}	
 	return 0;
 }
