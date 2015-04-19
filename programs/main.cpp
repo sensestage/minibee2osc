@@ -208,12 +208,13 @@ int main(int argc, char *argv[]) {
 	    hive->waitForPacket();
 	    res = hive->waitForOSC();
 // 	    std::cout << "Number of received OSC messages: " << res << std::endl;
-	    std::cin.getline(s,10);
-// 	    std::cout << "input: " << s << "\n";
-	    if(strcmp(s,"quit")==0){ 
-	      std::cout << "Got request to quit!\n";
-	      done = 1; 	      
-	    }
+	    //FIXME unfortunately this blocks:
+// 	    std::cin.getline(s,10);
+// // 	    std::cout << "input: " << s << "\n";
+// 	    if(strcmp(s,"quit")==0){ 
+// 	      std::cout << "Got request to quit!\n";
+// 	      done = 1; 	      
+// 	    }
 	    usleep(500);
   // 		  usleep(60000000);
 	  }
