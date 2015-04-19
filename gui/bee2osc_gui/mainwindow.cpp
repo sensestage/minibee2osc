@@ -90,9 +90,9 @@ void MainWindow::on_pushButton_start_clicked()
         QObject::connect(myProcess, SIGNAL(readyReadStandardError()), this, SLOT(readStdError()) );
         processStarted = true;
     } else {
-        myProcess->write( "quit\n" ); // not sure if this works
+//        myProcess->write( "quit\n" ); //FIXME: std::cin blocks, so this is not useable
 //        usleep( 2000 );
-//        myProcess->terminate();
+        myProcess->terminate();
 //        process_ended();
     }
 }
