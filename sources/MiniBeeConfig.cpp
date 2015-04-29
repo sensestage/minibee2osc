@@ -1,3 +1,5 @@
+#define SHAKERCONFIG
+
 // #include "xbee.h"
 // #include "xbeep.h"
 
@@ -25,8 +27,10 @@ MiniBeeDataPoint::~MiniBeeDataPoint(){
 
 MiniBeeConfig::MiniBeeConfig(){
   //FIXME: these are all defaults
-   msgTimeInterval = 28;
-   samplesPerMessage = 4;
+//    msgTimeInterval = 28;
+//    samplesPerMessage = 4;
+   msgTimeInterval = 15;
+   samplesPerMessage = 3;
 //   msgTimeInterval = 15;
 //   samplesPerMessage = 1;
   
@@ -34,12 +38,11 @@ MiniBeeConfig::MiniBeeConfig(){
   for ( i=0; i<19; i++ ){
     pinConfig[i] = UnConfigured;
   }
-//   pinConfig[0] = DigitalIn; // D3
-//   pinConfig[1] = DigitalIn; // D4
-//   pinConfig[2] = DigitalOut; // D5
+#ifdef SHAKERCONFIG
   pinConfig[0] = Custom; // D3
   pinConfig[2] = Custom; // D5
   pinConfig[4] = Custom; // D7
+#endif
 //   pinConfig[16] = AnalogIn10bit; // A6
   pinConfig[17] = AnalogIn10bit; // A7
   
@@ -51,7 +54,7 @@ MiniBeeConfig::MiniBeeConfig(){
     twiConfig[0] = TWI_ADXL345; //FIXME: a default!
   }
 
-//   numberOfCustomInputs = 4;
+#ifdef SHAKERCONFIG
   numberOfCustomInputs = 1;
   if ( numberOfCustomInputs > 0 ){
     customInputSizes = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
@@ -65,7 +68,10 @@ MiniBeeConfig::MiniBeeConfig(){
 //     customInputPins[2] = 4;  //FIXME: a default!
 //     customInputPins[2] = 0;  //FIXME: a default!
   }
+#else
   // deal with custom pins
+  numberOfCustomInputs = 0;
+#endif
   
   configid = 1;
   
