@@ -29,7 +29,7 @@ MiniBeeConfig::MiniBeeConfig(){
   //FIXME: these are all defaults
 //    msgTimeInterval = 28;
 //    samplesPerMessage = 4;
-   msgTimeInterval = 15;
+   msgTimeInterval = 21;
    samplesPerMessage = 3;
 //   msgTimeInterval = 15;
 //   samplesPerMessage = 1;
@@ -59,7 +59,7 @@ MiniBeeConfig::MiniBeeConfig(){
   if ( numberOfCustomInputs > 0 ){
     customInputSizes = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
     customInputPins = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
-    customInputSizes[0] = 1; //FIXME: a default!
+    customInputSizes[0] = 1; //FIXME: a default! = tilt
 //     customInputSizes[1] = 1; //FIXME: a default!
 //     customInputSizes[2] = 1; //FIXME: a default!
 //     customInputSizes[3] = 2; //FIXME: a default!
