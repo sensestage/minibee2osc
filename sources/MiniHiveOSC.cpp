@@ -482,6 +482,8 @@ HiveOscServer::~HiveOscServer()
 
 void HiveOscServer::addBasicMethods()
 {
+//   	addMethod( NULL, NULL, genericHandler, this );
+
 	addMethod( "/minibee/output",  NULL, minibeeOutputHandler, this );    // port, name
 	addMethod( "/minibee/custom",  NULL, minibeeCustomHandler, this );    // port, name
 	addMethod( "/minibee/configuration",  "iis", minibeeConfigHandler, this );    // port, name

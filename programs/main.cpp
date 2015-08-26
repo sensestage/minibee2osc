@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
 // 	      std::cout << "Got request to quit!\n";
 // 	      done = 1; 	      
 // 	    }
-	    usleep(500);
+	    usleep(500); // 500 microseconds = 0.5 ms
   // 		  usleep(60000000);
 	  }
 

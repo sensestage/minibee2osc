@@ -222,7 +222,7 @@ int MiniXHive::waitForPacket(){
     }
   }
 
-    if ( conCatchAll64->RxAvailable() > 0 ){
+  if ( conCatchAll64->RxAvailable() > 0 ){
     try {
 	    //con >> pkt; /* like this */
 	    pkt << *conCatchAll64;   /* or this */
