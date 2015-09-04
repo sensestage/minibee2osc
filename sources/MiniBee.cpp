@@ -342,7 +342,10 @@ void MiniXBee::process_data( std::vector<float> * parsed_data ){
 }
 
 int MiniXBee::send_id_message(){
-//TODO: send id message (msgtype I:msg ID + SH + SL + node ID + (*config ID*)
+  settings16.disableAck = 0; // always get acknowledgement
+  con16->setSettings(&settings16);
+
+  //TODO: send id message (msgtype I:msg ID + SH + SL + node ID + (*config ID*)
   if ( con64 == NULL ){
       return -1;
   }
@@ -364,6 +367,9 @@ int MiniXBee::send_id_message(){
 }
 
 int MiniXBee::send_config_message(){
+  settings16.disableAck = 0; // always get acknowledgement
+  con16->setSettings(&settings16);
+
   std::vector<unsigned char> mydata = configuration->getConfigMessage( mymsgid, id );
   
 //   std::cout << "configuration message: ";
@@ -380,6 +386,9 @@ int MiniXBee::send_config_message(){
 
 
 int MiniXBee::send_announce_message(){
+  settings16.disableAck = 0; // always get acknowledgement
+  con16->setSettings(&settings16);
+
   std::vector<unsigned char> mydata;
   mydata.push_back( 'A' );
 //   std::cout << "announce message: " << std::endl;
@@ -392,6 +401,9 @@ int MiniXBee::send_announce_message(){
 }
 
 int MiniXBee::send_quit_message(){
+  settings16.disableAck = 0; // always get acknowledgement
+  con16->setSettings(&settings16);
+
   std::vector<unsigned char> mydata;
   mydata.push_back( 'Q' );
 //   std::cout << "quit message: " << std::endl;
@@ -405,6 +417,9 @@ int MiniXBee::send_quit_message(){
 
 int MiniXBee::send_loopback(int onoff)
 {
+  settings16.disableAck = 0; // always get acknowledgement
+  con16->setSettings(&settings16);
+
   std::vector<unsigned char> mydata;
   mydata.push_back( 'L' );
   mydata.push_back( mymsgid );
@@ -420,6 +435,9 @@ int MiniXBee::send_loopback(int onoff)
 
 int MiniXBee::send_running(int onoff)
 {
+  settings16.disableAck = 0; // always get acknowledgement
+  con16->setSettings(&settings16);
+
   std::vector<unsigned char> mydata;
   mydata.push_back( 'R' );
   mydata.push_back( mymsgid );
@@ -433,13 +451,15 @@ int MiniXBee::send_running(int onoff)
   return retval;
 }
 
-int MiniXBee::send_custom( std::vector<int>* data)
+int MiniXBee::send_custom( std::vector<int>* data, unsigned char noAck )
 {
 //   std::cout << "custom message: " << std::endl;
 //   for ( auto i = data->begin(); i != data->end(); i++ ) {
 //     std::cout << (int) (*i) << ", ";
 //   }
 //   std::cout << std::endl;
+  settings16.disableAck = noAck;
+  con16->setSettings(&settings16);
 
   std::vector<unsigned char> mydata;
   mydata.push_back( 'E' );
@@ -455,13 +475,15 @@ int MiniXBee::send_custom( std::vector<int>* data)
   return retval;
 }
 
-int MiniXBee::send_output( std::vector< int >* data)
+int MiniXBee::send_output( std::vector< int >* data, unsigned char noAck)
 {
 //   std::cout << "send output message: " << id << " : ";
 //   for ( auto i = data->begin(); i != data->end(); i++ ) {
 //     std::cout << (int) (*i) << ", ";
 //   }
 //   std::cout << std::endl;
+  settings16.disableAck = noAck;
+  con16->setSettings(&settings16);
 
   std::vector<unsigned char> mydata;
   mydata.push_back( 'O' );
@@ -629,14 +651,16 @@ void MiniXBee::createConnections( libxbee::XBee * xbee ){
   if ( addr16.addr16_enabled == 1 ){
     try{
       con16 = new libxbee::Con( *xbee, "16-bit Data", &addr16 );
-//       con16TxStatus = new libxbee::Con( *xbee, "Transmit Status", &addr16 );
+//       con16TxStatus = new libxbee::Con( *xbee, "Transmit Status", &addr16 );      
+      con16->getSettings( &settings16 );
       std::ostringstream oss;
       oss << "MiniBee: created 16-bit data connection" << std::endl;
-      hive->writeToLog(10, oss.str() );
+      hive->writeToLog(10, oss.str() );      
     } catch (xbee_err err) {
       std::ostringstream oss;
       oss << "MiniBee: Could not create 16-bit data connection: " << err << "\n";
       hive->writeToLog(1, oss.str() );
+           
 //       return 1;
     }
   }

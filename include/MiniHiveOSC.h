@@ -41,8 +41,8 @@ namespace libminibee {
 
       bool postDebug;
       
-      void handle_minibee_output( int minibeeID, std::vector<int> * data );
-      void handle_minibee_custom( int minibeeID, std::vector<int> * data );
+      void handle_minibee_output( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
+      void handle_minibee_custom( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
       void handle_minibee_config( int minibeeID, int configID );
       void handle_minibee_run( int minibeeID, int onoff );
       void handle_minibee_loopback( int minibeeID, int onoff );
@@ -70,6 +70,8 @@ namespace libminibee {
   // 	static int errorHandler( handlerArgs );
 	  static int minibeeOutputHandler( handlerArgs );
 	  static int minibeeCustomHandler( handlerArgs );
+	  static int minibeeOutputNoAckHandler( handlerArgs );
+	  static int minibeeCustomNoAckHandler( handlerArgs );
 	  static int minibeeConfigHandler( handlerArgs );
 	  static int minibeeRunHandler( handlerArgs );
 	  static int minibeeLoopbackHandler( handlerArgs );

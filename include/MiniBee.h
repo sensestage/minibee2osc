@@ -117,8 +117,8 @@ namespace libminibee {
 
 	int send_announce_message();
 	int send_quit_message();
-	int send_output( std::vector<int> * data );
-	int send_custom( std::vector<int> * data );
+	int send_output( std::vector<int> * data, unsigned char noAck = 0 );
+	int send_custom( std::vector<int> * data, unsigned char noAck = 0 );
 // 	int send_custom( std::vector<unsigned char> * data );
 	int send_running( int onoff );
 	int send_loopback( int onoff );
@@ -156,6 +156,8 @@ namespace libminibee {
 
 	struct xbee_conAddress addr16;
 	struct xbee_conAddress addr64;
+	
+	struct xbee_conSettings settings16;
 	
 	MiniXHive * hive;
 	
