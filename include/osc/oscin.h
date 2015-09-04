@@ -72,4 +72,38 @@ public:
     class EServ { };
 };
 
+
+/// A wrapper class for the liblo osc server
+class BlockingOSCServer
+{
+
+public:
+    BlockingOSCServer( const char* port = "55000" );
+    BlockingOSCServer( BlockingOSCServer *orig );
+    ~BlockingOSCServer();
+
+//     int receive( int timeout );
+    void start();
+    void stop();
+
+    int getPort();
+
+    void sendBundle( lo_address targ, lo_bundle bundle );
+    void sendMessage( lo_address targ, const char *path, lo_message mess );
+    void sendSimpleMessage( lo_address targ, const char *path );
+    
+//     lo_message getMessage( const char* types, lo_arg** argv, int argc);
+
+    void        addMethod ( const char* path, const char* types, lo_method_handler h, void* user_data = NULL );
+    void        removeMethod ( const char* path, const char* types );
+    std::string getContent( const char* path, const char* types, lo_arg** argv, int argc, lo_address addr = NULL );
+
+    lo_server_thread serverThread;
+    lo_server server;
+//     int port;
+
+    // internal exception class 
+    class EServ { };
+};
+
 #endif

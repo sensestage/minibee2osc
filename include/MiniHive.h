@@ -29,32 +29,15 @@
 // #endif
 
 namespace libminibee {
-//   class MiniXHive; // handles connections with XBee
-//   
-//   class miniXHiveConnection: public libxbee::ConCallback {
-// 	public:
-// 	  explicit miniXHiveConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
-// // 	  : libxbee::ConCallback(parent, type, address);
-// 	  void xbee_conCallback(libxbee::Pkt **pkt);
-// 	  MiniXHive *minihive; // points to our minihive
-//   };
-// 
-//  
-//   class miniXHiveTXConnection: public libxbee::ConCallback {
-// 	public:
-// 	  explicit miniXHiveTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
-// // 	  : libxbee::ConCallback(parent, type, address) {};
-// 	  void xbee_conCallback(libxbee::Pkt **pkt);
-// 	  MiniXHive *minihive; // points to our minihive
-//   };
-// 
-//   class miniXHiveModemConnection: public libxbee::ConCallback {
-// 	public:
-// 	  explicit miniXHiveModemConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
-// // 	  : libxbee::ConCallback(parent, type, address) {};
-// 	  void xbee_conCallback(libxbee::Pkt **pkt);
-// 	  MiniXHive *minihive; // points to our minihive
-//   };
+  class MiniXHive; // handles connections with XBee
+  
+  class HiveConnection: public libxbee::ConCallback {
+	public:
+		explicit HiveConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL): libxbee::ConCallback(parent, type, address) {};
+		void xbee_conCallback(libxbee::Pkt **pkt);
+		MiniXHive * hive;
+		int type;
+  };
   
   class MiniXHive{
     public:
@@ -66,11 +49,17 @@ namespace libminibee {
 	int createOSCServer( const char * port );
 	int setTargetAddress( const char * host, const char * port );
 	int waitForOSC();
+	void startOSC();
+	void stopOSC();
 
 	int createXBee( std::string serialport, int loglevel );
+	
+	void parsePacket( int contype, libxbee::Pkt * pkt );
+	void tick();
+	
 	virtual void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data );
 	virtual void parseDataPacketCatchall( char type, int msgid, int msgsize, std::vector<unsigned char> data, struct xbee_conAddress *address );
-	virtual int waitForPacket();
+// 	virtual int waitForPacket();
 
 	// logging
 	void setLogLevel( int level );
@@ -97,14 +86,19 @@ namespace libminibee {
 	// moved from private
 // 	int numberOfBees;
 	int mymsgid;
+	
+	HiveConnection * con;
+	HiveConnection * conCatchAll;
+	HiveConnection * conCatchAll64;
 
-	libxbee::Con * con;
-// 	libxbee::Con * conTXStatus;
-	libxbee::Con * conCatchAll;
-	libxbee::Con * conCatchAll64;
+// // 	libxbee::Con * conTXStatus;
+// 	libxbee::Con * con;
+// 	libxbee::Con * conCatchAll;
+// 	libxbee::Con * conCatchAll64;
+	
 	libxbee::XBee * xbee;
 
-	virtual void waitForBeePackets();
+// 	virtual void waitForBeePackets();
 
 	void addMinibee( int id, MiniXBee * mbee );
 

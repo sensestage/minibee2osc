@@ -160,67 +160,66 @@ int main(int argc, char *argv[]) {
         }
     }
 
-   if (optind < argc) {
+    if (optind < argc) {
         printf("non-option ARGV-elements: ");
         while (optind < argc)
             printf("%s ", argv[optind++]);
         printf("\n");
     }
-	
-	
-	std::cout << "=============================================================" << std::endl;
-	std::cout << "Minibee to OSC" << std::endl;
-	std::cout << "configuration file: " << filename << std::endl;
-	std::cout << "serial port: " << serialport << std::endl;
-	std::cout << "OSC listening port: " << listenport << std::endl;
-	std::cout << "OSC target ip: " << targetip << ", target port: " << targetport << std::endl;
-	std::cout << "loglevel: " << loglevel << std::endl;
-	std::cout << "=============================================================" << std::endl;
-	
-	  /* setup libxbee */
-	libminibee::MiniXHive * hive;
-	hive = new libminibee::MiniXHive();
-	std::cout << "Creating XBee...\n";
-	
-	ret = hive->createXBee(serialport, loglevel); //TODO: serial port should be an argument to the start of program, log level too
 
-	if ( ret == 0 ){
-	  std::cout << "Opened connection...\n";
+    std::cout << "=============================================================" << std::endl;
+    std::cout << "Minibee to OSC" << std::endl;
+    std::cout << "configuration file: " << filename << std::endl;
+    std::cout << "serial port: " << serialport << std::endl;
+    std::cout << "OSC listening port: " << listenport << std::endl;
+    std::cout << "OSC target ip: " << targetip << ", target port: " << targetport << std::endl;
+    std::cout << "loglevel: " << loglevel << std::endl;
+    std::cout << "=============================================================" << std::endl;
 
-	  hive->readConfigurationFile( filename );
-	  std::cout << "Read configuration file...\n";
+    /* setup libxbee */
+    libminibee::MiniXHive * hive;
+    hive = new libminibee::MiniXHive();
+    std::cout << "Creating XBee...\n";
 
-	  hive->createOSCServer(listenport);
-	  hive->setTargetAddress( targetip, targetport );
-	  std::cout << "Created OSC interface...\n";
-	  
-	  if ( loglevel > 0 ){
-	    hive->oscServer->debug(true);
-	  }
-	  
-	  struct sigaction action;
-	  memset(&action, 0, sizeof(struct sigaction));
-	  action.sa_handler = term;
-	  sigaction(SIGTERM, &action, NULL);
-	  
-	  char s[10];
-	  while ( !done ){
-	    hive->waitForPacket();
-	    res = hive->waitForOSC();
+    ret = hive->createXBee(serialport, loglevel);
+
+    if ( ret == 0 ){
+      std::cout << "Opened connection...\n";
+
+      hive->readConfigurationFile( filename );
+      std::cout << "Read configuration file...\n";
+
+      hive->createOSCServer(listenport);
+      hive->setTargetAddress( targetip, targetport );
+      std::cout << "Created OSC interface...\n";
+      if ( loglevel > 0 ){
+	hive->oscServer->debug(true);
+      }
+      hive->startOSC();
+  
+      struct sigaction action;
+      memset(&action, 0, sizeof(struct sigaction));
+      action.sa_handler = term;
+      sigaction(SIGTERM, &action, NULL);
+
+      char s[10];
+      while ( !done ){
+// 	hive->tick();
+// 	hive->waitForPacket();
+// 	res = hive->waitForOSC();
 // 	    std::cout << "Number of received OSC messages: " << res << std::endl;
-	    //FIXME unfortunately this blocks:
-// 	    std::cin.getline(s,10);
+	//FIXME unfortunately this blocks:
+	std::cin.getline(s,10);
 // // 	    std::cout << "input: " << s << "\n";
-// 	    if(strcmp(s,"quit")==0){ 
-// 	      std::cout << "Got request to quit!\n";
-// 	      done = 1; 	      
-// 	    }
-	    usleep(500); // 500 microseconds = 0.5 ms
-  // 		  usleep(60000000);
-	  }
-
-	  std::cout << "Exiting minibee2osc...\n";
-	  std::cout << "=============================================================" << std::endl;
-	}	
-	return 0;
+	if(strcmp(s,"quit")==0){ 
+	  std::cout << "Got request to quit!\n";
+	  done = 1; 	      
+	}
+	usleep(1000); // 500 microseconds = 0.5 ms
+      }
+      hive->stopOSC();
+      std::cout << "Exiting minibee2osc...\n";
+      std::cout << "=============================================================" << std::endl;
+  }
+  return 0;
 }

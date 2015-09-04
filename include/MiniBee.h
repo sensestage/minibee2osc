@@ -51,39 +51,14 @@ namespace libminibee {
     OFF
   };
   
-//   class MiniXBee; // handles connections with XBee
-// 
-//   class miniXBeeConnection: public libxbee::ConCallback {
-// 	public:
-// 	  explicit miniXBeeConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
-// // 	  : libxbee::ConCallback(parent, type, address) {};
-// 	  void xbee_conCallback(libxbee::Pkt **pkt);
-// 	  MiniXBee *minibee; // points to our minibee
-//   };
-// 
-//   class miniXBee16Connection: public libxbee::ConCallback {
-// 	public:
-// 	  explicit miniXBee16Connection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
-// // 	  : libxbee::ConCallback(parent, type, address) {};
-// 	  void xbee_conCallback(libxbee::Pkt **pkt);
-// 	  MiniXBee *minibee; // points to our minibee
-//   };
-// 
-//   class miniXBeeATConnection: public libxbee::ConCallback {
-// 	public:
-// 	  explicit miniXBeeATConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
-// // 	  : libxbee::ConCallback(parent, type, address) {};
-// 	  void xbee_conCallback(libxbee::Pkt **pkt);
-// 	  MiniXBee *minibee; // points to our minibee
-//   };
-//   
-//   class miniXBeeTXConnection: public libxbee::ConCallback {
-// 	public:
-// 	  explicit miniXBeeTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL);
-// // 	  : libxbee::ConCallback(parent, type, address) {};
-// 	  void xbee_conCallback(libxbee::Pkt **pkt);
-// 	  MiniXBee *minibee; // points to our minibee
-//   };
+  class MiniXBee; // handles connections with XBee
+  
+  class BeeConnection: public libxbee::ConCallback {
+	public:
+		explicit BeeConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address = NULL): libxbee::ConCallback(parent, type, address) {};
+		void xbee_conCallback(libxbee::Pkt **pkt);
+		MiniXBee * bee;
+  };
   
   class MiniXBee{
     public:
@@ -93,7 +68,10 @@ namespace libminibee {
 	
 	virtual void setHive( MiniXHive * inhive );
 	
-	virtual int waitForPacket();
+	void tick();
+	
+	void parsePacket( libxbee::Pkt * pkt );
+// 	virtual int waitForPacket();
 	virtual void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data);
 
 	void createConnections( libxbee::XBee * xbee );
@@ -161,20 +139,16 @@ namespace libminibee {
 	
 	MiniXHive * hive;
 	
-	libxbee::Con * con16;
-// 	libxbee::Con * con16TxStatus;
-	libxbee::Con * con64;
-// 	libxbee::Con * con64TxStatus;	
-	libxbee::Con * conAT;
+	BeeConnection * con16;
+	BeeConnection * con64;
+	BeeConnection * conAT;
 	
-// 	miniXBee16Connection * conData16;
-// 	miniXBeeConnection * conData64;
-// // 	miniXBeeConnection * conIO16;
-// // 	miniXBeeConnection * conIO64;
-// 	miniXBeeATConnection * conRemoteAT;
-// 	miniXBeeTXConnection * conTXStatus16;
-// 	miniXBeeTXConnection * conTXStatus64;
-
+// 	libxbee::Con * con16;
+// // 	libxbee::Con * con16TxStatus;
+// 	libxbee::Con * con64;
+// // 	libxbee::Con * con64TxStatus;	
+// 	libxbee::Con * conAT;
+	
 	int status; // current state of minibee
 	unsigned char configid; // config id of the minibee
 	

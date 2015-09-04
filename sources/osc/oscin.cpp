@@ -193,3 +193,172 @@ std::string NonBlockOSCServer::getContent(const char* path, const char* types, l
     return contents.str();
 }
 
+
+/// BlockingOSCServer
+
+BlockingOSCServer::BlockingOSCServer( const char* port )
+{
+  
+    serverThread = lo_server_thread_new(port, NULL);
+
+//     lo_server_thread_add_method(st, "/videorec/record", "i", record_handler, NULL);
+//     lo_server_thread_add_method(st, "/videorec/quit", "", quit_handler, NULL);
+//     lo_server_thread_add_method(st, NULL, NULL, generic_handler, NULL);
+ 
+    server = lo_server_thread_get_server( serverThread );
+    if( server == NULL ){
+        throw EServ();
+    }
+}
+
+BlockingOSCServer::BlockingOSCServer( BlockingOSCServer *orig )
+{
+  serverThread = orig->serverThread;
+  server = orig->server;  
+}
+
+
+BlockingOSCServer::~BlockingOSCServer()
+{
+  if ( serverThread ){
+      this->stop();
+      lo_server_thread_free( serverThread );
+  }
+  if( server ){
+        lo_server_free( server );
+  }
+}
+
+// int BlockingOSCServer::receive( int timeout ){
+//    return lo_server_recv_noblock( server, timeout );
+// }
+
+int BlockingOSCServer::getPort()
+{
+  return lo_server_get_port( server );
+}
+
+void BlockingOSCServer::sendBundle(lo_address targ, lo_bundle bundle)
+{
+  lo_send_bundle_from( targ, server, bundle );
+}
+
+
+void BlockingOSCServer::sendMessage( lo_address targ, const char *path, lo_message mess )
+{
+  lo_send_message_from( targ, server, path, mess );
+}
+
+void BlockingOSCServer::sendSimpleMessage( lo_address targ, const char *path )
+{
+  lo_send_message_from( targ, server, path, NULL );
+}
+
+void BlockingOSCServer::start() 
+{
+    lo_server_thread_start( serverThread );    
+}
+
+
+void BlockingOSCServer::stop() 
+{
+    lo_server_thread_stop( serverThread );
+}
+
+void BlockingOSCServer::addMethod( const char* path, const char* types, lo_method_handler h, void* user_data ) 
+{
+    lo_server_thread_add_method( serverThread, path, types, h, user_data );
+}
+
+void BlockingOSCServer::removeMethod( const char* path, const char* types ) 
+{
+    lo_server_thread_del_method( serverThread, path, types );
+}
+
+/*
+lo_message BlockingOSCServer::getMessage( const char* types, lo_arg** argv, int argc)
+{
+  lo_message msg = lo_message_new();
+  for( int i = 0; i < argc; ++i )
+    {
+        switch( types[ i ] )
+        { 
+            case LO_FLOAT:
+	      lo_message_add_float( msg,argv[ i ]->f );
+              break;
+            case LO_INT32:
+	      lo_message_add_int32( msg,argv[ i ]->i );
+              break;	      
+            case LO_SYMBOL:
+	      lo_message_add_symbol( msg, &argv[ i ]->S );
+              break;
+            case LO_STRING:
+	      lo_message_add_string( msg,&argv[ i ]->s );
+              break;
+            case LO_CHAR:
+	      lo_message_add_char( msg,argv[ i ]->c );
+              break;
+            case LO_DOUBLE:
+	      lo_message_add_double( msg,argv[ i ]->d );
+              break;
+            case LO_INT64:
+	      lo_message_add_int64( msg,argv[ i ]->h );
+	      break;
+	    case LO_MIDI:
+	      lo_message_add_midi( msg,&argv[ i ]->m );
+	      break;
+	    case LO_TRUE:
+	      lo_message_add_true( msg );
+	      break;
+	    case LO_FALSE:
+	      lo_message_add_false( msg );
+	      break;
+	    case LO_NIL:
+	      lo_message_add_nil( msg );
+	      break;
+	    case LO_INFINITUM:
+	      lo_message_add_infinitum( msg );
+	      break;
+	    case LO_BLOB:
+	      lo_message_add_blob( msg, (lo_blob) argv[ i ] );
+	      break;
+	    case LO_TIMETAG:
+	      lo_message_add_timetag( msg, (lo_timetag) argv[ i ] );
+	      break;
+        }
+    }
+    return msg;
+}
+*/
+
+
+std::string BlockingOSCServer::getContent(const char* path, const char* types, lo_arg** argv, int argc, lo_address addr )
+{
+    std::ostringstream contents;
+
+    contents << "[BlockingOSCServer::"<< path << "]   ";
+    for( int i = 0; i < argc; ++i )
+    {
+        contents << types[ i ] << "=";
+        switch( types[ i ] )
+        {
+            case 's':
+                contents << &argv[ i ]->s;
+                break;
+            case 'f':
+                contents << argv[ i ]->f;
+                break;
+            case 'i':
+                contents << argv[ i ]->i;
+        }
+        contents << "   ";
+    }
+    if ( addr != NULL ){
+      contents << "from: ";
+      contents << lo_address_get_url( addr);
+//       contents << ":";
+//       contents << lo_address_get_port( addr );
+    }
+    return contents.str();
+}
+

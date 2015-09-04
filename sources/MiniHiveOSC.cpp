@@ -297,6 +297,18 @@ int HiveOscServer::minihiveSaveIDHandler( handlerArgs )
   return 0;
 }
 
+int HiveOscServer::minihiveTickHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug )
+    cout << "[HiveOscServer::minihiveTickHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  
+  server->handle_tick();
+  return 0;
+}
 int HiveOscServer::genericHandler( handlerArgs )
 {
   lo_message msg = (lo_message) data;
@@ -313,6 +325,11 @@ int HiveOscServer::genericHandler( handlerArgs )
 }
 
 // ---------------- handling incoming osc messages ---------
+
+void HiveOscServer::handle_tick()
+{
+  hive->tick();
+}
 
 void HiveOscServer::handle_minibee_output(int minibeeID, vector< int >* data, unsigned char noAck )
 {
@@ -393,7 +410,7 @@ void HiveOscServer::handle_minibee_announce(int minibeeID)
 
 void HiveOscServer::handle_minihive_reset()
 {
-  //TODO
+//TODO
 }
 
 void HiveOscServer::handle_minihive_saveid()
@@ -491,12 +508,12 @@ void HiveOscServer::sendTriggerMessage( int minibeeID, std::vector<unsigned char
 
 // ------------- creation methods and setting parameters ------------------
 
-HiveOscServer::HiveOscServer( const char *port ) : NonBlockOSCServer( port )
+HiveOscServer::HiveOscServer( const char *port ) : BlockingOSCServer( port )
 {
   postDebug = false;
 }
 
-HiveOscServer::HiveOscServer( HiveOscServer * orig ) : NonBlockOSCServer( orig ){
+HiveOscServer::HiveOscServer( HiveOscServer * orig ) : BlockingOSCServer( orig ){
   postDebug = orig->postDebug;
 }
 
@@ -531,6 +548,8 @@ HiveOscServer::~HiveOscServer()
 void HiveOscServer::addBasicMethods()
 {
 //   	addMethod( NULL, NULL, genericHandler, this );
+
+  	addMethod( "/minihive/tick",  NULL, minihiveTickHandler, this );    // port, name
 
 	addMethod( "/minibee/output",  NULL, minibeeOutputHandler, this );    // port, name
 	addMethod( "/minibee/custom",  NULL, minibeeCustomHandler, this );    // port, name

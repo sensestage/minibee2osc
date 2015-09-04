@@ -16,7 +16,7 @@
 namespace libminibee {
   class MiniXHive; // handles connections with XBee
 
-  class HiveOscServer : public NonBlockOSCServer {
+  class HiveOscServer : public BlockingOSCServer {
   public:
       HiveOscServer( const char *port );
       HiveOscServer( HiveOscServer *orig);
@@ -40,6 +40,8 @@ namespace libminibee {
 //       void sendConfiguredMessage( minibeeID,  );
 
       bool postDebug;
+
+      void handle_tick();
       
       void handle_minibee_output( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
       void handle_minibee_custom( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
@@ -67,6 +69,8 @@ namespace libminibee {
 
   // ----------- osc handlers ---------------
 
+	  static int minihiveTickHandler( handlerArgs );
+     
   // 	static int errorHandler( handlerArgs );
 	  static int minibeeOutputHandler( handlerArgs );
 	  static int minibeeCustomHandler( handlerArgs );

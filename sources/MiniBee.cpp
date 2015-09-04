@@ -17,56 +17,24 @@ using namespace libminibee;
 
 #include "minibee_utils.h"
 
-// miniXBeeConnection::miniXBeeConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address ): libxbee::ConCallback(parent, type, address) {};
-// miniXBee16Connection::miniXBee16Connection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address ): libxbee::ConCallback(parent, type, address) {};
-// miniXBeeTXConnection::miniXBeeTXConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address ): libxbee::ConCallback(parent, type, address) {};
-// miniXBeeATConnection::miniXBeeATConnection(libxbee::XBee &parent, std::string type, struct xbee_conAddress *address ): libxbee::ConCallback(parent, type, address) {};
-// 
-// void miniXBeeConnection::xbee_conCallback(libxbee::Pkt **pkt) {
-// 	std::cout << "MiniXBee Callback!!\n";
-// 	printXBeePacket( *pkt );
-// 
-// 	if ((*pkt)->size() > 0) {
-// 	  if ((*pkt)->size() > 2) { // type and msg id
-// 	    char type = (**pkt)[0];
-// 	    int msgid = (int) (**pkt)[1];
-// 	    minibee->parseDataPacket( type, msgid, (*pkt)->size(), (*pkt)->getVector() );
-// 	  }
-// 	}
-// }
-// 
-// void miniXBee16Connection::xbee_conCallback(libxbee::Pkt **pkt) {
-// 	std::cout << "MiniXBee 16 Callback!!\n";
-// 	printXBeePacket( *pkt );
-// 
-// 	if ((*pkt)->size() > 0) {
-// 	  if ((*pkt)->size() > 2) { // type and msg id
-// 	    char type = (**pkt)[0];
-// 	    int msgid = (int) (**pkt)[1];
-// 	    minibee->parseDataPacket( type, msgid, (*pkt)->size(), (*pkt)->getVector() );
-// 	  }
-// 	}
-// }
-// 
-// void miniXBeeTXConnection::xbee_conCallback(libxbee::Pkt **pkt) {
-// 	std::cout << "MiniXBee TX Callback!!\n";
-// 	printXBeePacket( *pkt );
-// 	
-// 	if ((*pkt)->size() > 0) {
-// 	  std::cout << "tx status data size: " <<  (*pkt)->size() << "\n"; 
-// 	}
-// 	  
-// }
-// 
-// void miniXBeeATConnection::xbee_conCallback(libxbee::Pkt **pkt) {
-// 	std::cout << "MiniXBee Remote AT Callback!!\n";
-// 	printXBeePacket( *pkt );
-// 	
-// 	if ((*pkt)->size() > 0) {
-// 	  std::cout << "remote at data size: " <<  (*pkt)->size() << "\n"; 
-// 	}
-// }
+void BeeConnection::xbee_conCallback(libxbee::Pkt **pkt) {
+	std::cout << "Bee Callback!!\n";
+	int i;
+	for (i = 0; i < (*pkt)->size(); i++) {
+		std::cout << (**pkt)[i];
+	}
+	std::cout << "\n";
 
+	bee->parsePacket( *pkt );
+
+	/* if you want to keep the packet, then you MUST do the following:
+	      libxbee::Pkt *myhandle = *pkt;
+	      *pkt = NULL;
+	   and then later, you MUST delete the packet to free up the memory:
+	      delete myhandle;
+	   if you do not want to keep the packet, then just leave everything as-is, and it will be free'd for you
+	*/
+}
 
 MiniXBee::MiniXBee(){
   initVariables();
@@ -650,7 +618,9 @@ void MiniXBee::setStatus(int newstatus)
 void MiniXBee::createConnections( libxbee::XBee * xbee ){
   if ( addr16.addr16_enabled == 1 ){
     try{
-      con16 = new libxbee::Con( *xbee, "16-bit Data", &addr16 );
+      con16 = new BeeConnection( *xbee, "16-bit Data", &addr16 );
+      con16->bee = this;      
+//       con16 = new libxbee::Con( *xbee, "16-bit Data", &addr16 );
 //       con16TxStatus = new libxbee::Con( *xbee, "Transmit Status", &addr16 );      
       con16->getSettings( &settings16 );
       std::ostringstream oss;
@@ -666,8 +636,12 @@ void MiniXBee::createConnections( libxbee::XBee * xbee ){
   }
   if ( addr64.addr64_enabled == 1 ){
     try{
-      con64 = new libxbee::Con( *xbee, "64-bit Data", &addr64 );
-      conAT = new libxbee::Con( *xbee, "Remote AT", &addr64 );
+      con64 = new BeeConnection( *xbee, "64-bit Data", &addr64 );
+      con64->bee = this;      
+      conAT = new BeeConnection( *xbee, "Remote AT", &addr64 );
+      conAT->bee = this;      
+//       con64 = new libxbee::Con( *xbee, "64-bit Data", &addr64 );
+//       conAT = new libxbee::Con( *xbee, "Remote AT", &addr64 );
 //       con64TxStatus = new libxbee::Con( *xbee, "Transmit Status", &addr64 );      
 //       std::cout << "MiniBee: created 64-bit data connection and remote AT" << std::endl;
       std::ostringstream oss;
@@ -679,35 +653,6 @@ void MiniXBee::createConnections( libxbee::XBee * xbee ){
       hive->writeToLog(1, oss.str() );
     }
   }
-//   if ( addr.addr16_enabled == 1 ){
-// //     if ( conData16 != NULL ){
-// //       delete conData16;
-// //     }
-// //     if ( conTXStatus16 != NULL ){
-// //       delete conTXStatus16;
-// //     }
-//     conData16 = new miniXBee16Connection( *xbee, "16-bit Data", &addr );
-//     conData16->minibee = this;
-//     conTXStatus16 = new miniXBeeTXConnection( *xbee, "Transmit Status", &addr );
-//     conTXStatus16->minibee = this;
-//   }
-//   if ( addr.addr64_enabled == 1 ){
-//     if ( conData64 != NULL ){
-//       delete conData64;
-//     }
-//     if ( conTXStatus64 != NULL ){
-//       delete conTXStatus64;
-//     }
-//     if ( conRemoteAT != NULL ){
-// 	delete conRemoteAT;
-//     }
-//     conData64 = new miniXBeeConnection( *xbee, "64-bit Data", &addr );
-//     conData64->minibee = this;
-//     conTXStatus64 = new miniXBeeTXConnection( *xbee, "Transmit Status", &addr );
-//     conTXStatus64->minibee = this;
-//     conRemoteAT = new miniXBeeATConnection( *xbee, "Remote AT", &addr );
-//     conRemoteAT->minibee = this;
-//   }
 }
 
 bool MiniXBee::set16bitAddress( struct xbee_conAddress xbaddr, libxbee::XBee * xbee ){
@@ -761,153 +706,120 @@ void MiniXBee::setHive(MiniXHive * inhive)
   hive = inhive;
 }
 
-
-int MiniXBee::waitForPacket(){
-  libxbee::Pkt pkt;
+void MiniXBee::parsePacket(libxbee::Pkt* pkt)
+{
   bool shouldLog = hive->getLogLevel() > 0;
+  if ( shouldLog ){
+    std::ostringstream oss;
+    oss << "packet 16: " << pkt->size() << std::endl;
+    streamXBeePacket(pkt, &oss );
+    hive->writeToLog( 10, oss.str() );
+  }
 
-//   if ( con16TxStatus->RxAvailable() > 0 ){
-//     try {
-// 	    //con >> pkt; /* like this */
-// 	    pkt << *con16TxStatus;   /* or this */
-//     } catch (xbee_err err) {
-// 	    std::cout << "Error on Rx! " << err << "\n";
-// 	    return 1;
+  if ( pkt->size() > 0) {
+    if ( pkt->size() > 2) { // type and msg id
+      char type = (*pkt)[0];
+      int msgid = (int) (*pkt)[1];
+      int msgsize = pkt->size();
+      std::vector<unsigned char> data = pkt->getVector();
+      this->parseDataPacket( type, msgid, pkt->size(), pkt->getVector() );
+      nodatacount = 0;
+    }
+  }
+}
+
+// int MiniXBee::waitForPacket(){
+//   libxbee::Pkt pkt;
+//   bool shouldLog = hive->getLogLevel() > 0;
+//   if ( con16 != NULL ){
+//     if ( con16->RxAvailable() > 0 ){
+//       try {
+// 	      //con >> pkt; /* like this */
+// 	      pkt << *con16;   /* or this */
+//       } catch (xbee_err err) {
+// 	      std::ostringstream oss;
+// 	      oss << "MiniBee: Error on Rx of con16! " << err << "\n";
+// 	      hive->writeToLog( 1, oss.str() );
+// 	      return 1;
+//       }
+//       try {
+// 	if ( shouldLog ){
+// 	  std::ostringstream oss;
+// 	  oss << "packet 16: " << pkt.size() << std::endl;
+// 	  streamXBeePacket(&pkt, &oss );
+// 	  hive->writeToLog( 10, oss.str() );
+// 	}
+// // 	printXBeePacket( &pkt );    
+// 	if ( pkt.size() > 0) {
+// 	  if ( pkt.size() > 2) { // type and msg id
+// 	    char type = pkt[0];
+// 	    int msgid = (int) pkt[1];
+// 	    int msgsize = pkt.size();
+// 	    std::vector<unsigned char> data = pkt.getVector();
+// // 	    std::cout << "packet 16 reaction: " << pkt.size() << std::endl;
+// 	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+// 	    nodatacount = 0;
+// 	  }
+// 	}
+//       } catch (xbee_err err) {
+// 	std::ostringstream oss;
+// 	oss << "MiniBee: Error accessing packet of con16! " << err << "\n";
+// 	hive->writeToLog( 1, oss.str() );
+// 	return 1;
+//       }
 //     }
-//     try {
-// 	std::cout << "packet 16 tx status: " << pkt.size() << std::endl;
-// 	printXBeePacket( &pkt );
-//     } catch (xbee_err err) {
-//       std::cout << "Error accessing packet! " << err << "\n";
-//       return 1;
+//   }
+//   
+//   if ( con64 != NULL ){
+//     if ( con64->RxAvailable() > 0 ){
+//       try {
+// 	      //con >> pkt; /* like this */
+// 	      pkt << *con64;   /* or this */
+//       } catch (xbee_err err) {
+// 	std::ostringstream oss;
+// 	oss << "MiniBee: Error on Rx of con64! " << err << "\n";
+// 	hive->writeToLog( 1, oss.str() );
+// 	return 1;
+//       }
+//       try {
+// 	if ( shouldLog ){
+// 	  std::ostringstream oss;
+// 	  oss << "packet 64: " << pkt.size() << std::endl;
+// 	  streamXBeePacket(&pkt, &oss );
+// 	  hive->writeToLog( 10, oss.str() );
+// 	}
+// 	if ( pkt.size() > 0) {
+// 	  if ( pkt.size() > 2) { // type and msg id
+// 	    char type = pkt[0];
+// 	    int msgid = (int) pkt[1];
+// 	    int msgsize = pkt.size();
+// 	    std::vector<unsigned char> data = pkt.getVector();
+// 	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
+// 	    nodatacount = 0;
+// // 	    std::cout << "packet 64 reaction: " << pkt.size() << std::endl;
+// 	  }
+// 	}
+//       } catch (xbee_err err) {
+// 	std::ostringstream oss;
+// 	oss << "MiniBee: Error accessing packet of con64! " << err << "\n";
+// 	hive->writeToLog( 1, oss.str() );
+// 	return 1;
+//       }
 //     }
 //   }
 // 
-//   if ( con64TxStatus->RxAvailable() > 0 ){
-//     try {
-// 	    //con >> pkt; /* like this */
-// 	    pkt << *con64TxStatus;   /* or this */
-//     } catch (xbee_err err) {
-// 	    std::cout << "Error on Rx! " << err << "\n";
-// 	    return 1;
-//     }
-//     try {
-// 	std::cout << "packet 64 tx status: " << pkt.size() << std::endl;
-// 	printXBeePacket( &pkt );
-//     } catch (xbee_err err) {
-//       std::cout << "Error accessing packet! " << err << "\n";
-//       return 1;
-//     }
+// 
+//   nodatacount++;
+//   if ( nodatacount > 10000 ){ // 5 seconds
+//       setStatus( OFF );
 //   }
+// }
 
-  if ( con16 != NULL ){
-    if ( con16->RxAvailable() > 0 ){
-      try {
-	      //con >> pkt; /* like this */
-	      pkt << *con16;   /* or this */
-      } catch (xbee_err err) {
-	      std::ostringstream oss;
-	      oss << "MiniBee: Error on Rx of con16! " << err << "\n";
-	      hive->writeToLog( 1, oss.str() );
-	      return 1;
-      }
-      try {
-	if ( shouldLog ){
-	  std::ostringstream oss;
-	  oss << "packet 16: " << pkt.size() << std::endl;
-	  streamXBeePacket(&pkt, &oss );
-	  hive->writeToLog( 10, oss.str() );
-	}
-// 	printXBeePacket( &pkt );    
-	if ( pkt.size() > 0) {
-	  if ( pkt.size() > 2) { // type and msg id
-	    char type = pkt[0];
-	    int msgid = (int) pkt[1];
-	    int msgsize = pkt.size();
-	    std::vector<unsigned char> data = pkt.getVector();
-// 	    std::cout << "packet 16 reaction: " << pkt.size() << std::endl;
-	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
-	    nodatacount = 0;
-	  }
-	}
-      } catch (xbee_err err) {
-	std::ostringstream oss;
-	oss << "MiniBee: Error accessing packet of con16! " << err << "\n";
-	hive->writeToLog( 1, oss.str() );
-	return 1;
-      }
-    }
-  }
-  
-  if ( con64 != NULL ){
-    if ( con64->RxAvailable() > 0 ){
-      try {
-	      //con >> pkt; /* like this */
-	      pkt << *con64;   /* or this */
-      } catch (xbee_err err) {
-	std::ostringstream oss;
-	oss << "MiniBee: Error on Rx of con64! " << err << "\n";
-	hive->writeToLog( 1, oss.str() );
-	return 1;
-      }
-      try {
-	if ( shouldLog ){
-	  std::ostringstream oss;
-	  oss << "packet 64: " << pkt.size() << std::endl;
-	  streamXBeePacket(&pkt, &oss );
-	  hive->writeToLog( 10, oss.str() );
-	}
-	if ( pkt.size() > 0) {
-	  if ( pkt.size() > 2) { // type and msg id
-	    char type = pkt[0];
-	    int msgid = (int) pkt[1];
-	    int msgsize = pkt.size();
-	    std::vector<unsigned char> data = pkt.getVector();
-	    this->parseDataPacket( type, msgid, pkt.size(), pkt.getVector() );
-	    nodatacount = 0;
-// 	    std::cout << "packet 64 reaction: " << pkt.size() << std::endl;
-	  }
-	}
-      } catch (xbee_err err) {
-	std::ostringstream oss;
-	oss << "MiniBee: Error accessing packet of con64! " << err << "\n";
-	hive->writeToLog( 1, oss.str() );
-	return 1;
-      }
-    }
-  }
 
-//   if ( conAT != NULL ){
-//     if ( conAT->RxAvailable() > 0 ){
-//       try {
-// 	      //con >> pkt; /* like this */
-// 	      pkt << *conAT;   /* or this */
-//       } catch (xbee_err err) {
-// 	      std::cout << "Error on Rx! " << err << "\n";
-// 	      return 1;
-//       }
-//       try {
-// 	  std::cout << "packet AT: " << pkt.size() << std::endl;
-// 	  printXBeePacket( &pkt );
-// 	  if ( pkt.size() > 0) {
-// 	    if ( pkt.size() > 2) { // type and msg id
-// 	      char type = pkt[0];
-// 	      int msgid = (int) pkt[1];
-// 	      int msgsize = pkt.size();
-// 	      std::vector<unsigned char> data = pkt.getVector();
-//   // 	    std::cout << "AT reaction: " << pkt.size() << std::endl;
-//   // 	    parseATPacket( type, msgid, pkt.size(), pkt.getVector() );
-// 	    }
-// 	  }
-//       } catch (xbee_err err) {
-// 	      std::cout << "Error accessing packet! " << err << "\n";
-// 	      return 1;
-//       }
-//     }
-//   }
-
+void MiniXBee::tick()
+{
   nodatacount++;
-  if ( nodatacount > 10000 ){ // 5 seconds
+  if ( nodatacount > 30 ){ // tick is sent from other application; assume once per second
       setStatus( OFF );
   }
 }
