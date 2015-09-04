@@ -26,7 +26,7 @@ int HiveOscServer::minibeeOutputHandler( handlerArgs )
   }
   
   if ( argc < 1 ){
-      std::cout << "MinibeeConfigMessage: too few arguments" << std::endl;
+      std::cout << "minibeeOutputHandler: too few arguments" << std::endl;
       return 0;
   }
 
@@ -35,7 +35,7 @@ int HiveOscServer::minibeeOutputHandler( handlerArgs )
   for ( int i=1; i<argc; i++ ){
       mydata.push_back( argv[i]->i );
   }
-  server->handle_minibee_output( id, &mydata );
+  server->handle_minibee_output( id, &mydata, 0 );
   return 0;
 }
 
@@ -49,7 +49,7 @@ int HiveOscServer::minibeeCustomHandler( handlerArgs )
     cout << "[HiveOscServer::minibeeCustomHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
   }
   if ( argc < 1 ){
-      std::cout << "MinibeeCustomMessage: too few arguments" << std::endl;
+      std::cout << "minibeeCustomHandler: too few arguments" << std::endl;
       return 0;
   }
   vector<int> mydata;
@@ -57,9 +57,57 @@ int HiveOscServer::minibeeCustomHandler( handlerArgs )
   for ( int i=1; i<argc; i++ ){
       mydata.push_back( argv[i]->i );
   }
-  server->handle_minibee_custom( id, &mydata );
+  server->handle_minibee_custom( id, &mydata, 0 );
   return 0;
 }
+
+
+int HiveOscServer::minibeeOutputNoAckHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug ){
+    cout << "[HiveOscServer::minibeeOutputNoAckHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  }
+  
+  if ( argc < 1 ){
+      std::cout << "minibeeOutputNoAckHandler: too few arguments" << std::endl;
+      return 0;
+  }
+
+  vector<int> mydata;
+  int id = argv[0]->i;
+  for ( int i=1; i<argc; i++ ){
+      mydata.push_back( argv[i]->i );
+  }
+  server->handle_minibee_output( id, &mydata, 1 );
+  return 0;
+}
+
+int HiveOscServer::minibeeCustomNoAckHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug ){
+    cout << "[HiveOscServer::minibeeCustomNoAckHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  }
+  if ( argc < 1 ){
+      std::cout << "minibeeCustomNoAckHandler: too few arguments" << std::endl;
+      return 0;
+  }
+  vector<int> mydata;
+  int id = argv[0]->i;
+  for ( int i=1; i<argc; i++ ){
+      mydata.push_back( argv[i]->i );
+  }
+  server->handle_minibee_custom( id, &mydata, 1 );
+  return 0;
+}
+
 
 int HiveOscServer::minibeeConfigHandler( handlerArgs )
 { 
@@ -266,17 +314,17 @@ int HiveOscServer::genericHandler( handlerArgs )
 
 // ---------------- handling incoming osc messages ---------
 
-void HiveOscServer::handle_minibee_output(int minibeeID, vector< int >* data)
+void HiveOscServer::handle_minibee_output(int minibeeID, vector< int >* data, unsigned char noAck )
 {
-  if ( hive->send_output_to_minibee( minibeeID, data ) < 0 ){
+  if ( hive->send_output_to_minibee( minibeeID, data, noAck ) < 0 ){
       // error message
     std::cout << "Error sending output message to minibee: " << minibeeID << std::endl;
   }
 }
 
-void HiveOscServer::handle_minibee_custom(int minibeeID, vector< int >* data)
+void HiveOscServer::handle_minibee_custom(int minibeeID, vector< int >* data, unsigned char noAck )
 {
-  if ( hive->send_custom_to_minibee( minibeeID, data ) < 0 ){
+  if ( hive->send_custom_to_minibee( minibeeID, data, noAck ) < 0 ){
       // error message
     std::cout << "Error sending custom message to minibee: " << minibeeID << std::endl;
   }
@@ -484,6 +532,8 @@ void HiveOscServer::addBasicMethods()
 {
 	addMethod( "/minibee/output",  NULL, minibeeOutputHandler, this );    // port, name
 	addMethod( "/minibee/custom",  NULL, minibeeCustomHandler, this );    // port, name
+	addMethod( "/minibee/output/noack",  NULL, minibeeOutputNoAckHandler, this );    // port, name
+	addMethod( "/minibee/custom/noack",  NULL, minibeeCustomNoAckHandler, this );    // port, name
 	addMethod( "/minibee/configuration",  "iis", minibeeConfigHandler, this );    // port, name
 	addMethod( "/minibee/configuration",  "ii", minibeeConfigHandler, this );    // port, name
 

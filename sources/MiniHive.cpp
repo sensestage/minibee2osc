@@ -502,20 +502,20 @@ int MiniXHive::setTargetAddress( const char * host, const char * port ){
 
 // ---------- osc messages to minibees ----------
 
-int MiniXHive::send_output_to_minibee(int minibeeID, std::vector< int > * data)
+int MiniXHive::send_output_to_minibee(int minibeeID, std::vector< int > * data, unsigned char noAck )
 {
   if ( minibees[ minibeeID ] == NULL ){
       return -1;
   }
-  return minibees[ minibeeID ]->send_output( data );
+  return minibees[ minibeeID ]->send_output( data, noAck );
 }
 
-int MiniXHive::send_custom_to_minibee(int minibeeID, std::vector< int > * data)
+int MiniXHive::send_custom_to_minibee(int minibeeID, std::vector< int > * data, unsigned char noAck )
 {
   if ( minibees[ minibeeID ] == NULL ){
       return -1;
   }
-  return minibees[ minibeeID ]->send_custom( data );
+  return minibees[ minibeeID ]->send_custom( data, noAck );
 }
 
 int MiniXHive::send_loopback_to_minibee(int minibeeID, int onoff)

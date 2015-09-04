@@ -77,8 +77,8 @@ namespace libminibee {
 	int send_announce_message_toFFFA();
 	
 	/// messages to minibee from OSC:
-	int send_output_to_minibee( int minibeeID, std::vector<int> * data );
-	int send_custom_to_minibee( int minibeeID, std::vector<int> * data );
+	int send_output_to_minibee( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
+	int send_custom_to_minibee( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
 	
 	int send_running_to_minibee( int minibeeID, int onoff );
 	int send_loopback_to_minibee( int minibeeID, int onoff );
