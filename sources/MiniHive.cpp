@@ -367,6 +367,13 @@ void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<
     case MINIBEE_N_INFO:
       oss << "FFFA: minibee info message " << type << ", " << msgid << ", " << msgsize << std::endl;
       break;
+    case MINIBEE_N_CONF: // confirm config
+      // node ID + config ID + smpMsg + msgInt + datasize + outsize + (*custom*) + customInputs + customDataSize + N x (custom pin, data size)
+      oss << "WARNING: minibee config message from FFFA" << std::endl;
+//       this->check_configuration_message( msgsize, data );
+//       status = WAIT_FORDATA;
+//       this->setStatus( WAIT_FORDATA );
+      break;
     default:
       oss << "WARNING: minibee message " << type << ", " << msgid << ", " << msgsize << std::endl;
       break;
