@@ -14,14 +14,14 @@ using namespace libxbee;
 using namespace libminibee;
 
 void HiveConnection::xbee_conCallback(libxbee::Pkt **pkt) {
-	std::cout << "Hive Callback!!\n";
-	int i;
-	for (i = 0; i < (*pkt)->size(); i++) {
-		std::cout << (**pkt)[i];
-	}
-	std::cout << "\n";
-
-	std::cout << type << "\n";
+// 	std::cout << "Hive Callback!!\n";
+// 	int i;
+// 	for (i = 0; i < (*pkt)->size(); i++) {
+// 		std::cout << (**pkt)[i];
+// 	}
+// 	std::cout << "\n";
+// 
+// 	std::cout << type << "\n";
 	hive->parsePacket( type, *pkt );
 
 	/* if you want to keep the packet, then you MUST do the following:

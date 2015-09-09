@@ -18,12 +18,12 @@ using namespace libminibee;
 #include "minibee_utils.h"
 
 void BeeConnection::xbee_conCallback(libxbee::Pkt **pkt) {
-	std::cout << "Bee Callback!!\n";
-	int i;
-	for (i = 0; i < (*pkt)->size(); i++) {
-		std::cout << (**pkt)[i];
-	}
-	std::cout << "\n";
+// 	std::cout << "Bee Callback!!\n";
+// 	int i;
+// 	for (i = 0; i < (*pkt)->size(); i++) {
+// 		std::cout << (**pkt)[i];
+// 	}
+// 	std::cout << "\n";
 
 	bee->parsePacket( *pkt );
 
