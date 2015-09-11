@@ -91,7 +91,7 @@ namespace libminibee {
 	
 	bool matchAddress( struct xbee_conAddress xbaddr ); // returns false when address does not match
 	
-	void parse_serial_message_noaddress( int msgsize, std::vector<unsigned char> data );
+	void parse_serial_message_catchall( int msgsize, std::vector<unsigned char> data );
 
 	int send_announce_message();
 	int send_quit_message();
@@ -104,7 +104,9 @@ namespace libminibee {
 	int send_reset();
 	int send_save_id();
 
-
+	void setStatus( int newstatus );
+	void check_configuration_message( int msgsize, std::vector<unsigned char> data );
+	
   protected:
 	int nodatacount;
 	// moved from private:
@@ -112,8 +114,6 @@ namespace libminibee {
 	MiniBeeConfig * configuration;
 	unsigned char id;    // node id of the minibee
 
-	void setStatus( int newstatus );
-	
 	virtual void process_data( std::vector<float> * parsed_data );
 	
 	virtual void parse_data( int msgsize, std::vector<unsigned char> data );
@@ -123,7 +123,6 @@ namespace libminibee {
 	int set_remote_id();
 	int send_id_message();
 	int send_config_message();
-	void check_configuration_message( int msgsize, std::vector<unsigned char> data );
 	
 	int send_digital_D3( unsigned char val );
 	int send_IO_D3( unsigned char val );

@@ -361,7 +361,7 @@ void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<
 	     // create a new minibee
 	    minibee = createNewMiniBee(newAddress);
 	  }
-        minibee->parse_serial_message_noaddress(msgsize, data);
+        minibee->parse_serial_message_catchall(msgsize, data);
       }
       break;
     case MINIBEE_N_INFO:
@@ -440,10 +440,12 @@ void MiniXHive::parseDataPacketCatchall( char type, int msgid, int msgsize, std:
       if ( msgsize > 10 ){
 	  memset(&newAddress, 0, sizeof(newAddress));
 	  newAddress.addr64_enabled = 1;
+	  address->addr64_enabled = 1;
 	  std::vector<unsigned char>::iterator it = data.begin();
 	  it++; it++; // start at index 2
 	  for ( int i=0; i<8; i++ ){
 	    newAddress.addr64[i] = *it;
+	    address->addr64[i] = *it;
 	    ++it;
 	  }
 	  streamXBeeAddress( newAddress, &oss );
@@ -453,11 +455,23 @@ void MiniXHive::parseDataPacketCatchall( char type, int msgid, int msgsize, std:
 	  minibee = findMiniBeeByAddress( newAddress );
 	  if ( minibee == NULL ){
 	     // create a new minibee
-	    minibee = createNewMiniBee(newAddress);
+	    minibee = createNewMiniBeeWithID( *address );
+// 	    minibee->set16bitAddress( address, xbee ); // use the address that was sent
 	    minibee->setHive( this );
 	  }
-	  minibee->parse_serial_message_noaddress(msgsize, data);
+	  minibee->parse_serial_message_catchall(msgsize, data);
       }
+      break;
+    case MINIBEE_N_CONF: // confirm config
+      minibee = findMiniBeeByAddress( *address );
+      if ( minibee == NULL ){
+	// create a new minibee
+	minibee = createNewMiniBeeWithID( *address );
+// 	    minibee->set16bitAddress( address, xbee ); // use the address that was sent
+	minibee->setHive( this );
+      }
+      minibee->check_configuration_message( msgsize, data );
+      minibee->setStatus( WAIT_FORDATA );
       break;
     case MINIBEE_N_INFO:
       oss << "Catchall: minibee info message " << type << ", " << msgid << ", " << msgsize << std::endl;

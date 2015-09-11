@@ -152,23 +152,26 @@ void MiniXBee::parse_serial_message( int msgsize, std::vector<unsigned char> dat
       addr64.addr64[i] = *it;
       ++it;
     }
-    this->parse_serial_message_noaddress( msgsize, data );
+    this->parse_serial_message_catchall( msgsize, data );
   }
 }
 
-void MiniXBee::parse_serial_message_noaddress( int msgsize, std::vector<unsigned char> data ){
+void MiniXBee::parse_serial_message_catchall( int msgsize, std::vector<unsigned char> data ){
     if ( msgsize > 12 ){
 	library_version = data[10];
 	board_revision = data[11];
 	capabilities = data[12];
 	remote_config = data[13];
     }
-    this->set_remote_id();
-    this->send_id_message();
-//     status = WAIT_FORCONFIG; 
-    this->setStatus( WAIT_FORCONFIG );
+    if ( remote_config == 0 ){
+      // no id setting, config comes automatically
+      this->setStatus( WAIT_FORCONFIRM );
+    } else {
+      this->set_remote_id();
+      this->send_id_message();      
+      this->setStatus( WAIT_FORCONFIG );
+    }
 }
-
 
 void MiniXBee::parse_trigger( int msgsize, std::vector<unsigned char> data ){
 //FIXME
