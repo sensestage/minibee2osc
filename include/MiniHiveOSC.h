@@ -35,6 +35,9 @@ namespace libminibee {
       void sendOutputErrorMessage( int minibeeID, std::vector<int> * data );
       void sendCustomErrorMessage( int minibeeID, std::vector<int> * data );
       void sendRunErrorMessage( int minibeeID, int onoff );
+      void sendOutputSuccessMessage( int minibeeID, std::vector<int> * data );
+      void sendCustomSuccessMessage( int minibeeID, std::vector<int> * data );
+      void sendRunSuccessMessage( int minibeeID, int onoff );
 
       void sendTriggerMessage( int minibeeID, std::vector<unsigned char> * data );
       void sendPrivateMessage( int minibeeID, std::vector<unsigned char> * data );

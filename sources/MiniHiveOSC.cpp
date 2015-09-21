@@ -337,6 +337,8 @@ void HiveOscServer::handle_minibee_output(int minibeeID, vector< int >* data, un
       // error message
     sendOutputErrorMessage( minibeeID, data );
 //     std::cout << "Error sending output message to minibee: " << minibeeID << std::endl;
+  } else {
+    sendOutputSuccessMessage( minibeeID, data );
   }
 }
 
@@ -346,6 +348,8 @@ void HiveOscServer::handle_minibee_custom(int minibeeID, vector< int >* data, un
       // error message
     sendCustomErrorMessage( minibeeID, data );
 //     std::cout << "Error sending custom message to minibee: " << minibeeID << std::endl;
+  } else {
+    sendCustomSuccessMessage( minibeeID, data );
   }
 }
 
@@ -372,6 +376,8 @@ void HiveOscServer::handle_minibee_run(int minibeeID, int onoff)
     sendRunErrorMessage( minibeeID, onoff );
       // error message
 //     std::cout << "Error sending running message to minibee: " << minibeeID << std::endl;
+  } else {
+    sendRunSuccessMessage( minibeeID, onoff );
   }
 
 }
@@ -473,6 +479,34 @@ void HiveOscServer::sendCustomErrorMessage( int minibeeID, std::vector<int> * da
     lo_message_add_int32( msg, n );
   }
   sendMessage( targetAddress, "/minibee/custom/error", msg );
+  lo_message_free( msg );
+}
+
+void HiveOscServer::sendOutputSuccessMessage( int minibeeID, std::vector<int> * data ){
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, minibeeID );
+  for (auto n : *data) {
+    lo_message_add_int32( msg, n );
+  }
+  sendMessage( targetAddress, "/minibee/output/success", msg );
+  lo_message_free( msg );
+}
+
+void HiveOscServer::sendRunSuccessMessage( int minibeeID, int onoff ){
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, minibeeID );
+  lo_message_add_int32( msg, onoff );
+  sendMessage( targetAddress, "/minibee/run/success", msg );
+  lo_message_free( msg );
+}
+
+void HiveOscServer::sendCustomSuccessMessage( int minibeeID, std::vector<int> * data ){
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, minibeeID );
+  for (auto n : *data) {
+    lo_message_add_int32( msg, n );
+  }
+  sendMessage( targetAddress, "/minibee/custom/success", msg );
   lo_message_free( msg );
 }
 
