@@ -31,7 +31,11 @@ namespace libminibee {
       void sendInfoMessage( int minibeeID, std::string serialnumber, int noin=0, int noout=0 );
       void sendOutputMessage( int minibeeID, std::vector<float> * data );
       void sendOutputBlockMessage( int minibeeID, int noSamples, std::vector<float> * data );
-	
+
+      void sendOutputErrorMessage( int minibeeID, std::vector<int> * data );
+      void sendCustomErrorMessage( int minibeeID, std::vector<int> * data );
+      void sendRunErrorMessage( int minibeeID, int onoff );
+
       void sendTriggerMessage( int minibeeID, std::vector<unsigned char> * data );
       void sendPrivateMessage( int minibeeID, std::vector<unsigned char> * data );
       void sendTriggerMessage( int minibeeID, std::vector<float> * data );

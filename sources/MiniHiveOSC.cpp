@@ -335,7 +335,8 @@ void HiveOscServer::handle_minibee_output(int minibeeID, vector< int >* data, un
 {
   if ( hive->send_output_to_minibee( minibeeID, data, noAck ) < 0 ){
       // error message
-    std::cout << "Error sending output message to minibee: " << minibeeID << std::endl;
+    sendOutputErrorMessage( minibeeID, data );
+//     std::cout << "Error sending output message to minibee: " << minibeeID << std::endl;
   }
 }
 
@@ -343,7 +344,8 @@ void HiveOscServer::handle_minibee_custom(int minibeeID, vector< int >* data, un
 {
   if ( hive->send_custom_to_minibee( minibeeID, data, noAck ) < 0 ){
       // error message
-    std::cout << "Error sending custom message to minibee: " << minibeeID << std::endl;
+    sendCustomErrorMessage( minibeeID, data );
+//     std::cout << "Error sending custom message to minibee: " << minibeeID << std::endl;
   }
 }
 
@@ -367,8 +369,9 @@ void HiveOscServer::handle_minibee_loopback(int minibeeID, int onoff)
 void HiveOscServer::handle_minibee_run(int minibeeID, int onoff)
 {
   if ( hive->send_running_to_minibee( minibeeID, onoff ) < 0 ){
+    sendRunErrorMessage( minibeeID, onoff );
       // error message
-    std::cout << "Error sending running message to minibee: " << minibeeID << std::endl;
+//     std::cout << "Error sending running message to minibee: " << minibeeID << std::endl;
   }
 
 }
@@ -444,6 +447,34 @@ void HiveOscServer::sendInfoMessage( int minibeeID, string serialnumber, int noi
   lo_message_free( msg );
 }
 
+
+void HiveOscServer::sendOutputErrorMessage( int minibeeID, std::vector<int> * data ){
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, minibeeID );
+  for (auto n : *data) {
+    lo_message_add_int32( msg, n );
+  }
+  sendMessage( targetAddress, "/minibee/output/error", msg );
+  lo_message_free( msg );
+}
+
+void HiveOscServer::sendRunErrorMessage( int minibeeID, int onoff ){
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, minibeeID );
+  lo_message_add_int32( msg, onoff );
+  sendMessage( targetAddress, "/minibee/run/error", msg );
+  lo_message_free( msg );
+}
+
+void HiveOscServer::sendCustomErrorMessage( int minibeeID, std::vector<int> * data ){
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, minibeeID );
+  for (auto n : *data) {
+    lo_message_add_int32( msg, n );
+  }
+  sendMessage( targetAddress, "/minibee/custom/error", msg );
+  lo_message_free( msg );
+}
 
 void HiveOscServer::sendOutputMessage( int minibeeID, std::vector<float> * data ){
   lo_message msg = lo_message_new();
