@@ -37,12 +37,17 @@ void BeeConnection::xbee_conCallback(libxbee::Pkt **pkt) {
 }
 
 MiniXBee::MiniXBee(){
+  conAT = NULL;
+  con16 = NULL;
+  con64 = NULL;
   initVariables();
 }
 
 MiniXBee::MiniXBee( int newid ){
 //   MiniXBee();  
-  
+  conAT = NULL;
+  con16 = NULL;
+  con64 = NULL;  
   initVariables();
   setID( newid );
 }
