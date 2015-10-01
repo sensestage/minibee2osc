@@ -22,7 +22,7 @@
 #include "MiniBeeConfigFile.h"
 
 #include <map>
-#include <boost/concept_check.hpp>
+// #include <boost/concept_check.hpp>
 
 // #ifndef EXPORT
 // #define EXPORT
