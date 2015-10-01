@@ -37,6 +37,7 @@ MiniXHive::MiniXHive(void)
 {
 //   numberOfBees = 0;
   mymsgid = 0;
+  shouldQuit = false;
   
   configFile = NULL;
   idAllocator = new MiniBeeIDAllocator();
@@ -324,6 +325,16 @@ void MiniXHive::parsePacket(int contype, Pkt* pkt)
 //     }
 //   }  
 // }
+
+bool MiniXHive::hasQuit()
+{
+  return shouldQuit;
+}
+
+void MiniXHive::quit()
+{
+  shouldQuit = true;
+}
 
 void MiniXHive::tick()
 {

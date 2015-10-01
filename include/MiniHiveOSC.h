@@ -49,6 +49,8 @@ namespace libminibee {
       bool postDebug;
 
       void handle_tick();
+      void handle_ping( int id );
+      void handle_quit();
       
       void handle_minibee_output( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
       void handle_minibee_custom( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
@@ -77,6 +79,8 @@ namespace libminibee {
   // ----------- osc handlers ---------------
 
 	  static int minihiveTickHandler( handlerArgs );
+	  static int minihivePingHandler( handlerArgs );
+	  static int minihiveQuitHandler( handlerArgs );
      
   // 	static int errorHandler( handlerArgs );
 	  static int minibeeOutputHandler( handlerArgs );

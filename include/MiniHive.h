@@ -22,6 +22,7 @@
 #include "MiniBeeConfigFile.h"
 
 #include <map>
+#include <boost/concept_check.hpp>
 
 // #ifndef EXPORT
 // #define EXPORT
@@ -57,6 +58,9 @@ namespace libminibee {
 	void parsePacket( int contype, libxbee::Pkt * pkt );
 	void tick();
 	
+	void quit();
+	bool hasQuit();
+	
 	virtual void parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data );
 	virtual void parseDataPacketCatchall( char type, int msgid, int msgsize, std::vector<unsigned char> data, struct xbee_conAddress *address );
 // 	virtual int waitForPacket();
@@ -86,6 +90,7 @@ namespace libminibee {
 	// moved from private
 // 	int numberOfBees;
 	int mymsgid;
+	bool shouldQuit;
 	
 	HiveConnection * con;
 	HiveConnection * conCatchAll;
