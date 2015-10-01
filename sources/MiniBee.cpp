@@ -836,67 +836,70 @@ void MiniXBee::tick()
 
 int MiniXBee::sendTx16( unsigned char frameid, std::vector<unsigned char> * data ){
   try{
-    if ( con16->Tx( &frameid, *data ) != XBEE_ENONE ) {
+    int ret = con16->Tx( &frameid, *data );
+    if ( ret != XBEE_ENONE ) {
       std::ostringstream oss;
       oss << "MiniBee: error transmitting 16bit" << std::endl;
       hive->writeToLog(2, oss.str() );
-      return -1;
+      return ret;
     }
     return 0;
   } catch (xbee_err err) {
       std::ostringstream oss;
       oss << "MiniBee: error transmitting via connection 16bit" << err << "\n";
       hive->writeToLog(1, oss.str() );
-      return -1;
+      return -30;
   } catch (libxbee::xbee_etx etx ){
       std::ostringstream oss;
       oss << "MiniBee: etx error transmitting via connection 16bit" << etx.ret << "\n";
       hive->writeToLog(1, oss.str() );
-      return -1;    
+      return -31;    
   }
 }
 
 int MiniXBee::sendTx64( unsigned char frameid, std::vector<unsigned char> * data ){
   try{
-    if ( con64->Tx( &frameid, *data ) != XBEE_ENONE ) {
+    int ret = con64->Tx( &frameid, *data );
+    if ( ret != XBEE_ENONE ) {
       std::ostringstream oss;
       oss << "MiniBee: error transmitting 64bit" << std::endl;
       hive->writeToLog(2, oss.str() );
 //       std::cout << "MiniBee: error transmitting 64bit" << std::endl;
-      return -1;
+      return ret;
     }
     return 0;
   } catch (xbee_err err) {
       std::ostringstream oss;
       oss << "MiniBee: error transmitting via connection 64bit" << err << "\n";
       hive->writeToLog(1, oss.str() );
-      return -1;
+      return -30;
   } catch (libxbee::xbee_etx etx ){
       std::ostringstream oss;
       oss << "MiniBee: etx error transmitting via connection 64bit" << etx.ret << "\n";
       hive->writeToLog(1, oss.str() );
-      return -1;    
+      return -31;    
   }
 }
 
 int MiniXBee::sendAT( unsigned char frameid, std::vector<unsigned char> * data ){
   try{
-    if ( conAT->Tx( &frameid, *data ) != XBEE_ENONE ) {
+    int ret = conAT->Tx( &frameid, *data );
+    if ( ret != XBEE_ENONE ) {
       std::ostringstream oss;
       oss << "MiniBee: error transmitting AT via connection" << "\n";
       hive->writeToLog(2, oss.str() );
-      return -1;
+      return ret;
     }
     return 0;
   } catch (xbee_err err) {
       std::ostringstream oss;
       oss << "MiniBee: error transmitting AT via connection" << err << "\n";
       hive->writeToLog(1, oss.str() );
-      return -1;
+      return -30;
   } catch (libxbee::xbee_etx etx ){
       std::ostringstream oss;
       oss << "MiniBee: etx error transmitting AT via connection" << etx.ret << "\n";
       hive->writeToLog(1, oss.str() );
-      return -1;
+      return -31;
   }
 }

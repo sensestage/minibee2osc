@@ -32,9 +32,9 @@ namespace libminibee {
       void sendOutputMessage( int minibeeID, std::vector<float> * data );
       void sendOutputBlockMessage( int minibeeID, int noSamples, std::vector<float> * data );
 
-      void sendOutputErrorMessage( int minibeeID, std::vector<int> * data );
-      void sendCustomErrorMessage( int minibeeID, std::vector<int> * data );
-      void sendRunErrorMessage( int minibeeID, int onoff );
+      void sendOutputErrorMessage( int minibeeID, std::vector<int> * data, int errorState );
+      void sendCustomErrorMessage( int minibeeID, std::vector<int> * data, int errorState );
+      void sendRunErrorMessage( int minibeeID, int onoff, int errorState );
       void sendOutputSuccessMessage( int minibeeID, std::vector<int> * data );
       void sendCustomSuccessMessage( int minibeeID, std::vector<int> * data );
       void sendRunSuccessMessage( int minibeeID, int onoff );
