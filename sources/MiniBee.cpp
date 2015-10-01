@@ -631,8 +631,11 @@ void MiniXBee::createConnections( libxbee::XBee * xbee ){
 //       con16 = new libxbee::Con( *xbee, "16-bit Data", &addr16 );
 //       con16TxStatus = new libxbee::Con( *xbee, "Transmit Status", &addr16 );      
       con16->getSettings( &settings16 );
+            
+      conAT = new BeeConnection( *xbee, "Remote AT", &addr16 );
+      conAT->bee = this; 
       std::ostringstream oss;
-      oss << "MiniBee: created 16-bit data connection" << std::endl;
+      oss << "MiniBee: created 16-bit data connection and remote AT" << std::endl;
       hive->writeToLog(10, oss.str() );      
     } catch (xbee_err err) {
       std::ostringstream oss;
@@ -645,15 +648,13 @@ void MiniXBee::createConnections( libxbee::XBee * xbee ){
   if ( addr64.addr64_enabled == 1 ){
     try{
       con64 = new BeeConnection( *xbee, "64-bit Data", &addr64 );
-      con64->bee = this;      
-      conAT = new BeeConnection( *xbee, "Remote AT", &addr64 );
-      conAT->bee = this;      
+      con64->bee = this;     
 //       con64 = new libxbee::Con( *xbee, "64-bit Data", &addr64 );
 //       conAT = new libxbee::Con( *xbee, "Remote AT", &addr64 );
 //       con64TxStatus = new libxbee::Con( *xbee, "Transmit Status", &addr64 );      
 //       std::cout << "MiniBee: created 64-bit data connection and remote AT" << std::endl;
       std::ostringstream oss;
-      oss << "MiniBee: created 64-bit data connection and remote AT" << std::endl;
+      oss << "MiniBee: created 64-bit data connection" << std::endl;
       hive->writeToLog(10, oss.str() );
     } catch (xbee_err err) {
       std::ostringstream oss;
