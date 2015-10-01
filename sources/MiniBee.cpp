@@ -848,12 +848,12 @@ int MiniXBee::sendTx16( unsigned char frameid, std::vector<unsigned char> * data
       std::ostringstream oss;
       oss << "MiniBee: error transmitting via connection 16bit" << err << "\n";
       hive->writeToLog(1, oss.str() );
-      return -30;
+      return err;
   } catch (libxbee::xbee_etx etx ){
       std::ostringstream oss;
       oss << "MiniBee: etx error transmitting via connection 16bit" << etx.ret << "\n";
       hive->writeToLog(1, oss.str() );
-      return -31;    
+      return etx.retVal;    
   }
 }
 
