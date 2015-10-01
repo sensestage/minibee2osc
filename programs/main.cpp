@@ -204,6 +204,9 @@ int main(int argc, char *argv[]) {
 
       char s[10];
       while ( !done ){
+	if ( hive->hasQuit() ){
+	    done = 1;
+	}
 // 	hive->tick();
 // 	hive->waitForPacket();
 // 	res = hive->waitForOSC();

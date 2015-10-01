@@ -297,6 +297,19 @@ int HiveOscServer::minihiveSaveIDHandler( handlerArgs )
   return 0;
 }
 
+int HiveOscServer::minihiveQuitHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug )
+    cout << "[HiveOscServer::minihiveQuitHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+  
+  server->handle_quit();
+  return 0;
+}
+
 int HiveOscServer::minihiveTickHandler( handlerArgs )
 { 
   lo_message msg = (lo_message) data;
@@ -309,6 +322,21 @@ int HiveOscServer::minihiveTickHandler( handlerArgs )
   server->handle_tick();
   return 0;
 }
+
+int HiveOscServer::minihivePingHandler( handlerArgs )
+{ 
+  lo_message msg = (lo_message) data;
+  lo_address addr = lo_message_get_source( msg );
+  HiveOscServer* server = ( HiveOscServer* ) user_data;
+
+  if ( server->postDebug )
+    cout << "[HiveOscServer::minihivePingHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
+
+  int id = argv[0]->i;  
+  server->handle_ping( id );
+  return 0;
+}
+
 int HiveOscServer::genericHandler( handlerArgs )
 {
   lo_message msg = (lo_message) data;
@@ -326,16 +354,33 @@ int HiveOscServer::genericHandler( handlerArgs )
 
 // ---------------- handling incoming osc messages ---------
 
+void HiveOscServer::handle_quit()
+{
+  hive->quit();
+}
+
 void HiveOscServer::handle_tick()
 {
   hive->tick();
+  // send tock back
+}
+
+void HiveOscServer::handle_ping( int id )
+{
+//   hive->tick();
+  // send tock back
+  lo_message msg = lo_message_new();
+  lo_message_add_int32( msg, id );
+  sendMessage( targetAddress, "/minihive/pong", msg );
+  lo_message_free( msg );
 }
 
 void HiveOscServer::handle_minibee_output(int minibeeID, vector< int >* data, unsigned char noAck )
 {
-  if ( hive->send_output_to_minibee( minibeeID, data, noAck ) < 0 ){
+  int ret = hive->send_output_to_minibee( minibeeID, data, noAck );
+  if ( ret < 0 ){
       // error message
-    sendOutputErrorMessage( minibeeID, data );
+    sendOutputErrorMessage( minibeeID, data, ret );
 //     std::cout << "Error sending output message to minibee: " << minibeeID << std::endl;
   } else {
     sendOutputSuccessMessage( minibeeID, data );
@@ -344,9 +389,10 @@ void HiveOscServer::handle_minibee_output(int minibeeID, vector< int >* data, un
 
 void HiveOscServer::handle_minibee_custom(int minibeeID, vector< int >* data, unsigned char noAck )
 {
-  if ( hive->send_custom_to_minibee( minibeeID, data, noAck ) < 0 ){
+  int ret = hive->send_custom_to_minibee( minibeeID, data, noAck );
+  if ( ret < 0 ){
       // error message
-    sendCustomErrorMessage( minibeeID, data );
+    sendCustomErrorMessage( minibeeID, data, ret );
 //     std::cout << "Error sending custom message to minibee: " << minibeeID << std::endl;
   } else {
     sendCustomSuccessMessage( minibeeID, data );
@@ -372,8 +418,9 @@ void HiveOscServer::handle_minibee_loopback(int minibeeID, int onoff)
 
 void HiveOscServer::handle_minibee_run(int minibeeID, int onoff)
 {
-  if ( hive->send_running_to_minibee( minibeeID, onoff ) < 0 ){
-    sendRunErrorMessage( minibeeID, onoff );
+  int ret = hive->send_running_to_minibee( minibeeID, onoff );
+  if ( ret < 0 ){
+    sendRunErrorMessage( minibeeID, onoff, ret );
       // error message
 //     std::cout << "Error sending running message to minibee: " << minibeeID << std::endl;
   } else {
@@ -454,9 +501,10 @@ void HiveOscServer::sendInfoMessage( int minibeeID, string serialnumber, int noi
 }
 
 
-void HiveOscServer::sendOutputErrorMessage( int minibeeID, std::vector<int> * data ){
+void HiveOscServer::sendOutputErrorMessage( int minibeeID, std::vector<int> * data, int errorState ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, minibeeID );
+  lo_message_add_int32( msg, errorState );
   for (auto n : *data) {
     lo_message_add_int32( msg, n );
   }
@@ -464,17 +512,19 @@ void HiveOscServer::sendOutputErrorMessage( int minibeeID, std::vector<int> * da
   lo_message_free( msg );
 }
 
-void HiveOscServer::sendRunErrorMessage( int minibeeID, int onoff ){
+void HiveOscServer::sendRunErrorMessage( int minibeeID, int onoff, int errorState ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, minibeeID );
+  lo_message_add_int32( msg, errorState );
   lo_message_add_int32( msg, onoff );
   sendMessage( targetAddress, "/minibee/run/error", msg );
   lo_message_free( msg );
 }
 
-void HiveOscServer::sendCustomErrorMessage( int minibeeID, std::vector<int> * data ){
+void HiveOscServer::sendCustomErrorMessage( int minibeeID, std::vector<int> * data, int errorState ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, minibeeID );
+  lo_message_add_int32( msg, errorState );
   for (auto n : *data) {
     lo_message_add_int32( msg, n );
   }
@@ -615,6 +665,8 @@ void HiveOscServer::addBasicMethods()
 //   	addMethod( NULL, NULL, genericHandler, this );
 
   	addMethod( "/minihive/tick",  NULL, minihiveTickHandler, this );    // port, name
+  	addMethod( "/minihive/ping",  NULL, minihivePingHandler, this );    // port, name
+  	addMethod( "/minihive/quit",  NULL, minihiveQuitHandler, this );    // port, name
 
 	addMethod( "/minibee/output",  NULL, minibeeOutputHandler, this );    // port, name
 	addMethod( "/minibee/custom",  NULL, minibeeCustomHandler, this );    // port, name

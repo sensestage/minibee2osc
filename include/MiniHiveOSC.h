@@ -32,9 +32,9 @@ namespace libminibee {
       void sendOutputMessage( int minibeeID, std::vector<float> * data );
       void sendOutputBlockMessage( int minibeeID, int noSamples, std::vector<float> * data );
 
-      void sendOutputErrorMessage( int minibeeID, std::vector<int> * data );
-      void sendCustomErrorMessage( int minibeeID, std::vector<int> * data );
-      void sendRunErrorMessage( int minibeeID, int onoff );
+      void sendOutputErrorMessage( int minibeeID, std::vector<int> * data, int errorState );
+      void sendCustomErrorMessage( int minibeeID, std::vector<int> * data, int errorState );
+      void sendRunErrorMessage( int minibeeID, int onoff, int errorState );
       void sendOutputSuccessMessage( int minibeeID, std::vector<int> * data );
       void sendCustomSuccessMessage( int minibeeID, std::vector<int> * data );
       void sendRunSuccessMessage( int minibeeID, int onoff );
@@ -49,6 +49,8 @@ namespace libminibee {
       bool postDebug;
 
       void handle_tick();
+      void handle_ping( int id );
+      void handle_quit();
       
       void handle_minibee_output( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
       void handle_minibee_custom( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
@@ -77,6 +79,8 @@ namespace libminibee {
   // ----------- osc handlers ---------------
 
 	  static int minihiveTickHandler( handlerArgs );
+	  static int minihivePingHandler( handlerArgs );
+	  static int minihiveQuitHandler( handlerArgs );
      
   // 	static int errorHandler( handlerArgs );
 	  static int minibeeOutputHandler( handlerArgs );
