@@ -46,6 +46,7 @@ MiniXBee::MiniXBee(){
 MiniXBee::MiniXBee( int newid ){
 //   MiniXBee();  
   conAT = NULL;
+  conAT64 = NULL;
   con16 = NULL;
   con64 = NULL;  
   initVariables();
@@ -478,13 +479,13 @@ int MiniXBee::send_output( std::vector< int >* data, unsigned char noAck)
 }
 
 int MiniXBee::set_remote_id(){
-  if ( conAT == NULL ){ return -1; };
+  if ( conAT64 == NULL ){ return -1; };
   std::vector<unsigned char> mydata;
   mydata.push_back('M');
   mydata.push_back('Y');
   mydata.push_back(id);
   unsigned char frameid = mymsgid;
-  int retval = sendAT( frameid, &mydata );
+  int retval = sendAT64( frameid, &mydata );
   mymsgid++;
   mymsgid = mymsgid%256;
   return retval;
@@ -649,12 +650,14 @@ void MiniXBee::createConnections( libxbee::XBee * xbee ){
     try{
       con64 = new BeeConnection( *xbee, "64-bit Data", &addr64 );
       con64->bee = this;     
+      conAT64 = new BeeConnection( *xbee, "Remote AT", &addr64 );
+      conAT64->bee = this; 
 //       con64 = new libxbee::Con( *xbee, "64-bit Data", &addr64 );
 //       conAT = new libxbee::Con( *xbee, "Remote AT", &addr64 );
 //       con64TxStatus = new libxbee::Con( *xbee, "Transmit Status", &addr64 );      
 //       std::cout << "MiniBee: created 64-bit data connection and remote AT" << std::endl;
       std::ostringstream oss;
-      oss << "MiniBee: created 64-bit data connection" << std::endl;
+      oss << "MiniBee: created 64-bit data connection and remote AT" << std::endl;
       hive->writeToLog(10, oss.str() );
     } catch (xbee_err err) {
       std::ostringstream oss;
@@ -887,6 +890,29 @@ int MiniXBee::sendAT( unsigned char frameid, std::vector<unsigned char> * data )
     if ( ret != XBEE_ENONE ) {
       std::ostringstream oss;
       oss << "MiniBee: error transmitting AT via connection" << "\n";
+      hive->writeToLog(2, oss.str() );
+      return ret;
+    }
+    return 0;
+  } catch (xbee_err err) {
+      std::ostringstream oss;
+      oss << "MiniBee: error transmitting AT via connection" << err << "\n";
+      hive->writeToLog(1, oss.str() );
+      return -30;
+  } catch (libxbee::xbee_etx etx ){
+      std::ostringstream oss;
+      oss << "MiniBee: etx error transmitting AT via connection" << etx.ret << "\n";
+      hive->writeToLog(1, oss.str() );
+      return -31;
+  }
+}
+
+int MiniXBee::sendAT64( unsigned char frameid, std::vector<unsigned char> * data ){
+  try{
+    int ret = conAT64->Tx( &frameid, *data );
+    if ( ret != XBEE_ENONE ) {
+      std::ostringstream oss;
+      oss << "MiniBee: error transmitting AT64 via connection" << "\n";
       hive->writeToLog(2, oss.str() );
       return ret;
     }

@@ -385,6 +385,11 @@ void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<
 //       status = WAIT_FORDATA;
 //       this->setStatus( WAIT_FORDATA );
       break;
+    case MINIBEE_N_WAIT: // serial number
+//       // Serial High (SH) + Serial Low (SL) + library version + board revision + capabilities
+      send_announce_message_toFFFA();
+      std::cout << "FIXME: minibee waiting message " << type << ", " << msgid << ", " << msgsize <<  std::endl;
+      break;
     default:
       oss << "WARNING: minibee message " << type << ", " << msgid << ", " << msgsize << std::endl;
       break;
@@ -392,11 +397,6 @@ void MiniXHive::parseDataPacket( char type, int msgid, int msgsize, std::vector<
 //       std::cout << "FIXME: minibee data message " << type << ", " << msgid << ", " << msgsize << std::endl;
 //       // send back announce message
 //       break;
-   case MINIBEE_N_WAIT: // serial number
-//       // Serial High (SH) + Serial Low (SL) + library version + board revision + capabilities
-      send_announce_message_toFFFA();
-      std::cout << "FIXME: minibee waiting message " << type << ", " << msgid << ", " << msgsize <<  std::endl;
-      break;
 //    case MINIBEE_N_ACTIVE:
 //       std::cout << "FIXME: minibee active message " << type << ", " << msgid << ", " << msgsize << std::endl;
 //       break;

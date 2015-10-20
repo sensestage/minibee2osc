@@ -130,6 +130,7 @@ namespace libminibee {
 	int sendTx16( unsigned char frameid, std::vector<unsigned char> * data );
 	int sendTx64( unsigned char frameid, std::vector<unsigned char> * data );
 	int sendAT( unsigned char frameid, std::vector<unsigned char> * data );
+	int sendAT64( unsigned char frameid, std::vector<unsigned char> * data );
 
 	struct xbee_conAddress addr16;
 	struct xbee_conAddress addr64;
@@ -141,6 +142,7 @@ namespace libminibee {
 	BeeConnection * con16;
 	BeeConnection * con64;
 	BeeConnection * conAT;
+	BeeConnection * conAT64;
 	
 // 	libxbee::Con * con16;
 // // 	libxbee::Con * con16TxStatus;
