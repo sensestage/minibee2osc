@@ -7,9 +7,7 @@
 
 #include <string.h>
 #include <list>
-#include <map>
-
-#include <tinyxml2.h>
+// #include <map>
 
 // #include "MiniBeeConfig.h"
 // #include "MiniBee.h"
