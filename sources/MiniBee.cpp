@@ -287,6 +287,22 @@ void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
 	    itData++; byteIndex++;
 	    curData = *itData;
 	    break;
+	  case 32:
+	    newdata = (float) curData * 256. * 256. * 256.;
+	    itData++; byteIndex++;
+	    curData = *itData;
+	    newdata += (float) curData * 256. * 256.;
+	    itData++; byteIndex++;
+	    curData = *itData;
+	    newdata += (float) curData * 256.;
+	    itData++; byteIndex++;
+	    curData = *itData;
+	    newdata += (float) curData;
+	    newdata = (newdata + (float) (*it3)) / (float) (*it2 );
+	    parsed_data.push_back(newdata);
+	    itData++; byteIndex++;
+	    curData = *itData;
+	    break;
 	}
       }
       it++; it2++; it3++;
@@ -556,6 +572,12 @@ void MiniXBee::check_configuration_message( int msgsize, std::vector<unsigned ch
    // + (*custom*) + customInputs + customDataSize + N x (custom pin, data size)
    //TODO: check whether it matches the configuration
    //TODO: add the custom data
+   unsigned char datavalue;
+   for ( auto i = data.begin(); i != data.end(); i++ ) {
+     datavalue = (*i);
+     std::cout << (int) (datavalue) << ", ";
+   }
+   std::cout << std::endl;
 }
 
 void MiniXBee::setConfiguration( MiniBeeConfig * conf ){

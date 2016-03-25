@@ -116,6 +116,12 @@ void MiniBeeConfig::calcDataProperties(void){
 	case 2: 
 	  dataBitSizes.push_back(16);
 	  break;
+	case 3: 
+	  dataBitSizes.push_back(24);
+	  break;
+	case 4: 
+	  dataBitSizes.push_back(32);
+	  break;
       }
   }
   
