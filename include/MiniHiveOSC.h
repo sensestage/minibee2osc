@@ -35,9 +35,11 @@ namespace libminibee {
       void sendOutputErrorMessage( int minibeeID, std::vector<int> * data, int errorState );
       void sendCustomErrorMessage( int minibeeID, std::vector<int> * data, int errorState );
       void sendRunErrorMessage( int minibeeID, int onoff, int errorState );
+      void sendForgetErrorMessage( int minibeeID, int errorState );
       void sendOutputSuccessMessage( int minibeeID, std::vector<int> * data );
       void sendCustomSuccessMessage( int minibeeID, std::vector<int> * data );
       void sendRunSuccessMessage( int minibeeID, int onoff );
+      void sendForgetSuccessMessage( int minibeeID );
 
       void sendTriggerMessage( int minibeeID, std::vector<unsigned char> * data );
       void sendPrivateMessage( int minibeeID, std::vector<unsigned char> * data );
@@ -55,6 +57,8 @@ namespace libminibee {
       void handle_minibee_output( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
       void handle_minibee_custom( int minibeeID, std::vector<int> * data, unsigned char noAck = 0 );
       void handle_minibee_config( int minibeeID, int configID );
+      
+      void handle_minibee_forget( int minibeeID );
       void handle_minibee_run( int minibeeID, int onoff );
       void handle_minibee_loopback( int minibeeID, int onoff );
       void handle_minibee_reset( int minibeeID );
@@ -88,6 +92,9 @@ namespace libminibee {
 	  static int minibeeOutputNoAckHandler( handlerArgs );
 	  static int minibeeCustomNoAckHandler( handlerArgs );
 	  static int minibeeConfigHandler( handlerArgs );
+
+	  static int minibeeForgetHandler( handlerArgs );
+
 	  static int minibeeRunHandler( handlerArgs );
 	  static int minibeeLoopbackHandler( handlerArgs );
 	  static int minibeeResetHandler( handlerArgs );

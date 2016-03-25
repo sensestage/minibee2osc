@@ -105,6 +105,7 @@ namespace libminibee {
 	int send_save_id();
 
 	void setStatus( int newstatus );
+	int getStatus();
 	void check_configuration_message( int msgsize, std::vector<unsigned char> data );
 	
   protected:

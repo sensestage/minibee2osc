@@ -23,8 +23,10 @@ namespace libminibee {
 	  MiniBeeIDAllocator(void);
 	  ~MiniBeeIDAllocator(void);
 	  
+	  bool free( int id );
 	  void add( int id );
 	  bool isAvailable( int id );
+	  bool isAssigned( int id );
 	  int nextAvailable();
 	  void print();
 

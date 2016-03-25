@@ -623,6 +623,10 @@ void MiniXBee::setStatus(int newstatus)
   status = newstatus;
 }
 
+int MiniXBee::getStatus()
+{
+    return status;
+}
 
 void MiniXBee::createConnections( libxbee::XBee * xbee ){
   if ( addr16.addr16_enabled == 1 ){
