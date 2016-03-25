@@ -1,7 +1,12 @@
 #include "MiniBeeAllocator.h"
 // start of MiniBeeIDAllocator
 
-using namespace libminibee
+#include <iostream>
+#include <algorithm>
+
+using namespace libminibee;
+
+
 
 MiniBeeIDAllocator::MiniBeeIDAllocator(){
     highest = 0;
@@ -37,6 +42,7 @@ void MiniBeeIDAllocator::add( int id ){
 }
 
 bool MiniBeeIDAllocator::isAssigned( int id ){
+//   std::list<int>::iterator findIter = assigned.find( id );
   std::list<int>::iterator findIter = std::find(assigned.begin(), assigned.end(), id );
   if ( findIter == assigned.end() ){ return false; }{ return true; }
 }

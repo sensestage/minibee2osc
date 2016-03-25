@@ -19,8 +19,9 @@
 #include "MiniBee.h"
 #include "osc/oscin.h"
 
-#include "MiniBeeConfigFile.h"
 #include "MiniBeeAllocator.h"
+#include "MiniBeeConfigFile.h"
+
 
 #include <map>
 // #include <boost/concept_check.hpp>

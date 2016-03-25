@@ -643,7 +643,7 @@ int MiniXHive::send_loopback_to_minibee(int minibeeID, int onoff)
 
 int MiniXHive::try_forget_minibee( int minibeeID )
 {
-  MiniXBee * bee = minibee[ minibeeID ];
+  MiniXBee * bee = minibees[ minibeeID ];
   if ( bee == NULL ){
       return -1; // minibee not found
   }
@@ -653,7 +653,7 @@ int MiniXHive::try_forget_minibee( int minibeeID )
   if ( !idAllocator->free( minibeeID ) ){ // I can free it
       return -3; // it was not found in the allocator
   }
-  minibees->erase( minibeeID );
+  minibees.erase( minibeeID );
   // do I need to delete it as well?
   delete bee;
   return 0;

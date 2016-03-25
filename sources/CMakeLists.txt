@@ -12,6 +12,7 @@ set(minibee_osc_lib_SRCS
 #   main.cpp
   MiniBee.cpp
   MiniHive.cpp
+  MiniBeeAllocator.cpp
   MiniBeeConfig.cpp
   MiniBeeConfigFile.cpp
   minibee_utils.cpp
