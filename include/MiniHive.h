@@ -19,6 +19,9 @@
 #include "MiniBee.h"
 #include "osc/oscin.h"
 
+#include "MiniBeeConfigFile.h"
+#include "MiniBeeAllocator.h"
+
 #include <map>
 
 // #ifndef EXPORT

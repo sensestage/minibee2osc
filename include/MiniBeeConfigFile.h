@@ -13,28 +13,11 @@
 
 #include "MiniBeeConfig.h"
 #include "MiniBee.h"
+#include "MiniBeeAllocator.h"
 
 using namespace tinyxml2;
 
 namespace libminibee {
-  
-  class MiniBeeIDAllocator{
-      public:
-	  MiniBeeIDAllocator(void);
-	  ~MiniBeeIDAllocator(void);
-	  
-	  bool free( int id );
-	  void add( int id );
-	  bool isAvailable( int id );
-	  bool isAssigned( int id );
-	  int nextAvailable();
-	  void print();
-
-    private:
-	  int highest;
-	  std::list<int> available;
-	  std::list<int> assigned;
-  };
     
   class MiniBeeConfigFile{
     public:
