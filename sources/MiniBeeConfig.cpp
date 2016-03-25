@@ -107,6 +107,12 @@ void MiniBeeConfig::calcDataProperties(void){
 	  dataScales.push_back( 1 );
 	  dataOffsets.push_back( 0 );
 	  break;
+	case 3: 
+	  dataBitSizes.push_back(24);
+	  break;
+	case 4: 
+	  dataBitSizes.push_back(32);
+	  break;
       }
   }
   
