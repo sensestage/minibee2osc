@@ -574,7 +574,6 @@ int MiniXBee::send_IO_D3(unsigned char val)
   return retval;
 }
 
-
 int MiniXBee::send_save_id()
 {
   if ( conAT == NULL ){ return -1; };
@@ -613,6 +612,11 @@ MiniBeeConfig * MiniXBee::getConfiguration(){
 
 void MiniXBee::setID( int newid ){
     id = newid;
+}
+
+int MiniXBee::getID()
+{
+  return id;
 }
 
 void MiniXBee::setConfigID( int newid ){

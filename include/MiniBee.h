@@ -99,6 +99,7 @@ namespace libminibee {
 	void setConfiguration( MiniBeeConfig * conf );
 	MiniBeeConfig * getConfiguration();
 	
+	int getID();
 	void setID( int newid );
 	void setConfigID( int newid );
 	bool set16bitAddress( struct xbee_conAddress xbaddr, libxbee::XBee * xbee ); // returns false when not a valid address
@@ -119,9 +120,9 @@ namespace libminibee {
 	int send_reset();
 	int send_save_id();
 
-	void setStatus( int newstatus );
+// 	void setStatus( int newstatus );
 	int getStatus();
-	void check_configuration_message( int msgsize, std::vector<unsigned char> data );
+// 	void check_configuration_message( int msgsize, std::vector<unsigned char> data );
 	
   protected:
 	int nodatacount;

@@ -97,8 +97,9 @@ namespace libminibee {
 
     protected:
 	// moved from private
-	int numberOfBees;
+// 	int numberOfBees;
 	int mymsgid;
+	MiniBeeIDAllocator * idAllocator;
 
 	libxbee::Con * con;
 // 	libxbee::Con * conTXStatus;

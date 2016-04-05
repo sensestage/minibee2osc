@@ -48,8 +48,10 @@ using namespace libminibee;
 
 MiniXHive::MiniXHive(void)
 {
-  numberOfBees = 0;
+//   numberOfBees = 0;
   mymsgid = 0;
+  
+  idAllocator = new MiniBeeIDAllocator();
 }
 
 MiniXHive::~MiniXHive(void)
@@ -405,21 +407,25 @@ void MiniXHive::parseDataPacketCatchall( char type, int msgid, int msgsize, std:
 }
 
 MiniXBee * MiniXHive::createNewMiniBee( struct xbee_conAddress beeAddress ){
- numberOfBees++;
- MiniXBee * minibee = new MiniXBee( numberOfBees );
+ MiniXBee * minibee = new MiniXBee();
+ int newID;
+ newID = idAllocator->nextAvailable();
+ idAllocator->add( newID ); // and add it, as we'll use it   
+ minibee->setID( newID );
+
  minibee->setHive( this );
  minibee->set64bitAddress( beeAddress, xbee );
  
  beeAddress.addr16_enabled = 1;
- beeAddress.addr16[0] = (unsigned char) (numberOfBees/256);
- beeAddress.addr16[1] = (unsigned char) numberOfBees%256;
+ beeAddress.addr16[0] = (unsigned char) (newID/256);
+ beeAddress.addr16[1] = (unsigned char) newID%256;
  minibee->set16bitAddress( beeAddress, xbee );
 //  std::cout << "minibees before insert: " << minibees.size() << std::endl; 
- minibees[numberOfBees] = minibee;
+ minibees[newID] = minibee;
 //  std::cout << "minibees after insert: " << minibees.size() << std::endl;
  minibee->createConnections(xbee);
  
- oscServer->sendInfoMessage(numberOfBees, xbeeAddress64AsString( beeAddress ) );
+ oscServer->sendInfoMessage(newID, xbeeAddress64AsString( beeAddress ) );
 
  return minibee;
 }
@@ -433,6 +439,7 @@ void MiniXHive::addMinibee(int id, MiniXBee* mbee)
 MiniXBee * MiniXHive::createNewMiniBeeWithID( struct xbee_conAddress beeAddress ){
 //  numberOfBees++;
  int id = beeAddress.addr16[0]*256 + beeAddress.addr16[1];
+ idAllocator->add( id ); // and add it
  MiniXBee * minibee = new MiniXBee( id );
  minibee->setHive( this );
  minibee->set16bitAddress( beeAddress, xbee );
