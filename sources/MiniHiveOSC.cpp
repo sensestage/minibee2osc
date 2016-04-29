@@ -141,7 +141,7 @@ int HiveOscServer::minibeeForgetHandler( handlerArgs )
   if ( server->postDebug ){
     cout << "[HiveOscServer::minibeeForgetHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
   }
-  if ( argc < 2 ){
+  if ( argc < 1 ){
       std::cout << "MinibeeForgetMessage: too few arguments" << std::endl;
       return 0;
   }
