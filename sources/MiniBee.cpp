@@ -928,6 +928,13 @@ int MiniXBee::waitForPacket(){
 
 
 int MiniXBee::sendTx16( unsigned char frameid, std::vector<unsigned char> * data ){
+  if ( con16 == NULL ){
+      std::ostringstream oss;
+      oss << "MiniBee: error 16bit connection not there" << std::endl;
+      hive->writeToLog(2, oss.str() );
+//       std::cout << "MiniBee: error transmitting 64bit" << std::endl;
+      return -1;   
+  }
   try{
     if ( con16->Tx( &frameid, *data ) != XBEE_ENONE ) {
       std::ostringstream oss;
@@ -950,6 +957,13 @@ int MiniXBee::sendTx16( unsigned char frameid, std::vector<unsigned char> * data
 }
 
 int MiniXBee::sendTx64( unsigned char frameid, std::vector<unsigned char> * data ){
+  if ( con64 == NULL ){
+      std::ostringstream oss;
+      oss << "MiniBee: error 64bit connection not there" << std::endl;
+      hive->writeToLog(2, oss.str() );
+//       std::cout << "MiniBee: error transmitting 64bit" << std::endl;
+      return -1;   
+  }
   try{
     if ( con64->Tx( &frameid, *data ) != XBEE_ENONE ) {
       std::ostringstream oss;
@@ -973,6 +987,12 @@ int MiniXBee::sendTx64( unsigned char frameid, std::vector<unsigned char> * data
 }
 
 int MiniXBee::sendAT( unsigned char frameid, std::vector<unsigned char> * data ){
+  if ( conAT == NULL ){
+      std::ostringstream oss;
+      oss << "MiniBee: error AT connection invalid" << "\n";
+      hive->writeToLog(2, oss.str() );
+      return -1;
+  }
   try{
     if ( conAT->Tx( &frameid, *data ) != XBEE_ENONE ) {
       std::ostringstream oss;
