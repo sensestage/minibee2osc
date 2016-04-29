@@ -370,13 +370,13 @@ void HiveOscServer::handle_minibee_forget(int minibeeID)
 {
   int ret = hive->try_forget_minibee( minibeeID );
   if ( ret < 0 ){
-    sendForgetErrorMessage( minibeeID, ret );
+    //FIXME: targetAddress is wrong somehow, so sending messages back doesn't work if subclassing
+//     sendForgetErrorMessage( minibeeID, ret );
       // error message
-//     std::cout << "Error sending running message to minibee: " << minibeeID << std::endl;
-  } else {
-    sendForgetSuccessMessage( minibeeID );
+    std::cout << "Error sending running message to minibee: " << minibeeID << std::endl;
+//   } else {
+//     sendForgetSuccessMessage( minibeeID );
   }
-
 }
 
 void HiveOscServer::handle_minibee_run(int minibeeID, int onoff)
