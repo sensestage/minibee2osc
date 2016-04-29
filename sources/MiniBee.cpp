@@ -361,8 +361,8 @@ void MiniXBee::process_data( std::vector<float> * parsed_data ){
 }
 
 int MiniXBee::send_id_message(){
-  settings16.disableAck = 0; // always get acknowledgement
-  con16->setSettings(&settings16);
+//   settings16.disableAck = 0; // always get acknowledgement
+//   con16->setSettings(&settings16);
 
   //TODO: send id message (msgtype I:msg ID + SH + SL + node ID + (*config ID*)
   if ( con64 == NULL ){
@@ -386,8 +386,8 @@ int MiniXBee::send_id_message(){
 }
 
 int MiniXBee::send_config_message(){
-  settings16.disableAck = 0; // always get acknowledgement
-  con16->setSettings(&settings16);
+//   settings16.disableAck = 0; // always get acknowledgement
+//   con16->setSettings(&settings16);
 
   std::vector<unsigned char> mydata = configuration->getConfigMessage( mymsgid, id );
   
