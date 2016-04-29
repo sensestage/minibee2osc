@@ -100,6 +100,9 @@ void MiniXBee::initVariables(void)
 
 
 MiniXBee::~MiniXBee(){
+  delete con16;
+  delete conAT;
+  delete con64;
 //   free(&addr);
 }
 
