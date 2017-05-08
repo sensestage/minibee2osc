@@ -39,6 +39,7 @@ void BeeConnection::xbee_conCallback(libxbee::Pkt **pkt) {
 MiniXBee::MiniXBee(){
   conAT = NULL;
   con16 = NULL;
+  conAT64 = NULL;
   con64 = NULL;
   initVariables();
 }
@@ -75,6 +76,10 @@ void MiniXBee::initVariables(void)
 
 MiniXBee::~MiniXBee(){
 //   free(&addr);
+  delete con16;
+  delete conAT;
+  delete con64;
+  delete conAT64;
 }
 
 void MiniXBee::parseDataPacket( char type, int msgid, int msgsize, std::vector<unsigned char> data ){
@@ -158,6 +163,8 @@ void MiniXBee::parse_serial_message( int msgsize, std::vector<unsigned char> dat
       addr64.addr64[i] = *it;
       ++it;
     }
+    //FIXME: create conAT64 if not there
+    this->createConnections( hive->getXBee() );
     this->parse_serial_message_catchall( msgsize, data );
   }
 }
@@ -664,14 +671,17 @@ int MiniXBee::getStatus()
 void MiniXBee::createConnections( libxbee::XBee * xbee ){
   if ( addr16.addr16_enabled == 1 ){
     try{
-      con16 = new BeeConnection( *xbee, "16-bit Data", &addr16 );
-      con16->bee = this;      
+      if ( con16 == NULL ){
+	con16 = new BeeConnection( *xbee, "16-bit Data", &addr16 );
+	con16->bee = this;
+      }
 //       con16 = new libxbee::Con( *xbee, "16-bit Data", &addr16 );
 //       con16TxStatus = new libxbee::Con( *xbee, "Transmit Status", &addr16 );      
       con16->getSettings( &settings16 );
-            
-      conAT = new BeeConnection( *xbee, "Remote AT", &addr16 );
-      conAT->bee = this; 
+      if ( conAT == NULL ){     
+	conAT = new BeeConnection( *xbee, "Remote AT", &addr16 );
+	conAT->bee = this; 
+      }
       std::ostringstream oss;
       oss << "MiniBee: created 16-bit data connection and remote AT" << std::endl;
       hive->writeToLog(10, oss.str() );      
@@ -685,10 +695,14 @@ void MiniXBee::createConnections( libxbee::XBee * xbee ){
   }
   if ( addr64.addr64_enabled == 1 ){
     try{
-      con64 = new BeeConnection( *xbee, "64-bit Data", &addr64 );
-      con64->bee = this;     
-      conAT64 = new BeeConnection( *xbee, "Remote AT", &addr64 );
-      conAT64->bee = this; 
+      if ( con64 == NULL ){
+	con64 = new BeeConnection( *xbee, "64-bit Data", &addr64 );
+	con64->bee = this;     
+      }
+      if ( conAT64 == NULL ){
+	conAT64 = new BeeConnection( *xbee, "Remote AT", &addr64 );
+	conAT64->bee = this; 
+      }
 //       con64 = new libxbee::Con( *xbee, "64-bit Data", &addr64 );
 //       conAT = new libxbee::Con( *xbee, "Remote AT", &addr64 );
 //       con64TxStatus = new libxbee::Con( *xbee, "Transmit Status", &addr64 );      
@@ -875,6 +889,13 @@ void MiniXBee::tick()
 
 
 int MiniXBee::sendTx16( unsigned char frameid, std::vector<unsigned char> * data ){
+  if ( con16 == NULL ){
+      std::ostringstream oss;
+      oss << "MiniBee: error 16bit connection not there" << std::endl;
+      hive->writeToLog(2, oss.str() );
+//       std::cout << "MiniBee: error transmitting 64bit" << std::endl;
+      return -1;   
+  }
   try{
     int ret = con16->Tx( &frameid, *data );
     if ( ret != XBEE_ENONE ) {
@@ -898,6 +919,13 @@ int MiniXBee::sendTx16( unsigned char frameid, std::vector<unsigned char> * data
 }
 
 int MiniXBee::sendTx64( unsigned char frameid, std::vector<unsigned char> * data ){
+  if ( con64 == NULL ){
+      std::ostringstream oss;
+      oss << "MiniBee: error 64bit connection not there" << std::endl;
+      hive->writeToLog(2, oss.str() );
+//       std::cout << "MiniBee: error transmitting 64bit" << std::endl;
+      return -1;   
+  }
   try{
     int ret = con64->Tx( &frameid, *data );
     if ( ret != XBEE_ENONE ) {
@@ -922,6 +950,13 @@ int MiniXBee::sendTx64( unsigned char frameid, std::vector<unsigned char> * data
 }
 
 int MiniXBee::sendAT( unsigned char frameid, std::vector<unsigned char> * data ){
+  if ( conAT == NULL ){
+      std::ostringstream oss;
+      oss << "MiniBee: error 16 bit AT connection not there" << std::endl;
+      hive->writeToLog(2, oss.str() );
+//       std::cout << "MiniBee: error transmitting 64bit" << std::endl;
+      return -1;   
+  }
   try{
     int ret = conAT->Tx( &frameid, *data );
     if ( ret != XBEE_ENONE ) {
@@ -945,6 +980,13 @@ int MiniXBee::sendAT( unsigned char frameid, std::vector<unsigned char> * data )
 }
 
 int MiniXBee::sendAT64( unsigned char frameid, std::vector<unsigned char> * data ){
+  if ( conAT64 == NULL ){
+      std::ostringstream oss;
+      oss << "MiniBee: error 64bit AT connection not there" << std::endl;
+      hive->writeToLog(2, oss.str() );
+//       std::cout << "MiniBee: error transmitting 64bit" << std::endl;
+      return -1;   
+  }
   try{
     int ret = conAT64->Tx( &frameid, *data );
     if ( ret != XBEE_ENONE ) {
