@@ -163,7 +163,7 @@ void MiniXBee::parse_serial_message( int msgsize, std::vector<unsigned char> dat
       addr64.addr64[i] = *it;
       ++it;
     }
-    //FIXME: create conAT64 if not there
+    
     this->createConnections( hive->getXBee() );
     this->parse_serial_message_catchall( msgsize, data );
   }
