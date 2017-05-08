@@ -84,7 +84,7 @@ namespace libminibee {
 	int send_running_to_minibee( int minibeeID, int onoff );
 	int send_loopback_to_minibee( int minibeeID, int onoff );
 	
-	int send_reset_to_minibee( int minibeeID );
+	int send_reset_to_minibee( int minibeeID, int stage );
 	int send_save_id_to_minibee( int minibeeID );
 	int send_announce_to_minibee( int minibeeID );
 	

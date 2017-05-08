@@ -667,12 +667,12 @@ int MiniXHive::send_running_to_minibee(int minibeeID, int onoff)
   return minibees[ minibeeID ]->send_running( onoff );  
 }
 
-int MiniXHive::send_reset_to_minibee(int minibeeID)
+int MiniXHive::send_reset_to_minibee(int minibeeID, int stage)
 {
   if ( minibees[ minibeeID ] == NULL ){
       return -1;
   }
-  return minibees[ minibeeID ]->send_reset();
+  return minibees[ minibeeID ]->send_reset( stage );
 }
 
 int MiniXHive::send_save_id_to_minibee(int minibeeID)

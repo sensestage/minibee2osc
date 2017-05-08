@@ -507,21 +507,32 @@ int MiniXBee::set_remote_id(){
   return retval;
 }
 
-int MiniXBee::send_reset()
+int MiniXBee::send_reset( int stage )
 {
   if ( conAT == NULL ){ return -1; };
-  // 'D3' 5
-  if ( send_digital_D3( 5 ) != 0 ){
-    return -1;
-  }
-  // 'IO' 8
-  if ( send_IO_D3( 8 ) != 0 ){
-    return -1;
-  }
-  // 'IO' 0  
-  if ( send_IO_D3( 0 ) != 0 ){
-    return -1;
-  }
+  switch( stage ){
+    case 0:
+      // 'D3' 5
+      if ( send_digital_D3( 5 ) != 0 ){
+	return -1;
+      }
+      break;
+    case 1:
+      // 'IO' 8
+      if ( send_IO_D3( 8 ) != 0 ){
+	 return -1;
+      }
+      break;
+    case 2:
+      // 'IO' 0        
+      if ( send_IO_D3( 0 ) != 0 ){
+	return -1;
+      }
+      setStatus( OFF );
+      break;
+    default:
+      return -1;
+  }  
   return 0;
 }
 
@@ -541,8 +552,8 @@ int MiniXBee::send_digital_D3(unsigned char val)
 int MiniXBee::send_IO_D3(unsigned char val)
 {
   std::vector<unsigned char> mydata;
-  mydata.push_back('D');
-  mydata.push_back('3');
+  mydata.push_back('I');
+  mydata.push_back('O');
   mydata.push_back(val);
   unsigned char frameid = mymsgid;
   int retval = sendAT( frameid, &mydata );

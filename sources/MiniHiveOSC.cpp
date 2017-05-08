@@ -141,7 +141,7 @@ int HiveOscServer::minibeeForgetHandler( handlerArgs )
   if ( server->postDebug ){
     cout << "[HiveOscServer::minibeeForgetHandler] " + server->getContent( path, types, argv, argc, addr ) << "\n";
   }
-  if ( argc < 2 ){
+  if ( argc < 1 ){
       std::cout << "MinibeeForgetMessage: too few arguments" << std::endl;
       return 0;
   }
@@ -205,7 +205,8 @@ int HiveOscServer::minibeeResetHandler( handlerArgs )
       return 0;
   }
   int id = argv[0]->i;
-  server->handle_minibee_reset( id );
+  int stage = argv[1]->i;
+  server->handle_minibee_reset( id, stage );
   return 0;
 }
 
@@ -259,7 +260,8 @@ int HiveOscServer::minihiveResetHandler( handlerArgs )
       return 0;
   }
   int id = argv[0]->i;
-  server->handle_minibee_reset( id );
+  int stage = argv[0]->i;
+  server->handle_minibee_reset( id, stage );
   return 0;
 }
 
@@ -461,9 +463,9 @@ void HiveOscServer::handle_minibee_run(int minibeeID, int onoff)
 
 }
 
-void HiveOscServer::handle_minibee_reset(int minibeeID)
+void HiveOscServer::handle_minibee_reset(int minibeeID, int stage)
 {
-  if ( hive->send_reset_to_minibee( minibeeID ) < 0 ){
+  if ( hive->send_reset_to_minibee( minibeeID, stage ) < 0 ){
       // error message
     std::cout << "Error sending reset message to minibee: " << minibeeID << std::endl;
   }
@@ -732,7 +734,7 @@ void HiveOscServer::addBasicMethods()
 	addMethod( "/minibee/forget",  "i", minibeeForgetHandler, this );    // forget a minibee
 
 	addMethod( "/minibee/run",  "ii", minibeeRunHandler, this );    // port, name
-	addMethod( "/minibee/reset",  "i", minibeeResetHandler, this );    // port, name
+	addMethod( "/minibee/reset",  "ii", minibeeResetHandler, this );    // port, name
 	addMethod( "/minibee/saveid",  "i", minibeeSaveIDHandler, this );    // port, name
 	addMethod( "/minibee/announce", "i", minibeeAnnounceHandler, this );    // port, name
 // 

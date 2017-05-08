@@ -61,7 +61,7 @@ namespace libminibee {
       void handle_minibee_forget( int minibeeID );
       void handle_minibee_run( int minibeeID, int onoff );
       void handle_minibee_loopback( int minibeeID, int onoff );
-      void handle_minibee_reset( int minibeeID );
+      void handle_minibee_reset( int minibeeID, int stage  );
       void handle_minibee_saveid( int minibeeID );
       void handle_minibee_announce( int minibeeID );
 

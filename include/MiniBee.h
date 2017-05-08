@@ -101,7 +101,7 @@ namespace libminibee {
 	int send_running( int onoff );
 	int send_loopback( int onoff );
 	
-	int send_reset();
+	int send_reset( int stage );
 	int send_save_id();
 
 	void setStatus( int newstatus );
