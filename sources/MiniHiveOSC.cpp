@@ -392,7 +392,7 @@ void HiveOscServer::handle_ping( int id )
   // send tock back
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, id );
-  sendMessage( targetAddress, "/minihive/pong", msg );
+  sendMessage( this->targetAddress, "/minihive/pong", msg );
   lo_message_free( msg );
 }
 
@@ -520,7 +520,7 @@ void HiveOscServer::sendStatusMessage( int minibeeID, string status, int statusi
   lo_message_add_int32( msg, minibeeID );
   lo_message_add_string( msg, status.c_str() );
   lo_message_add_int32( msg, statusid );
-  sendMessage( targetAddress, "/minibee/status", msg );
+  sendMessage( this->targetAddress, "/minibee/status", msg );
   lo_message_free( msg );
 }
 
@@ -530,7 +530,7 @@ void HiveOscServer::sendInfoMessage( int minibeeID, string serialnumber, int noi
   lo_message_add_int32( msg, minibeeID );
   lo_message_add_int32( msg, noin );
   lo_message_add_int32( msg, noout );
-  sendMessage( targetAddress, "/minibee/info", msg );
+  sendMessage( this->targetAddress, "/minibee/info", msg );
   lo_message_free( msg );
 }
 
@@ -542,7 +542,7 @@ void HiveOscServer::sendOutputErrorMessage( int minibeeID, std::vector<int> * da
   for (auto n : *data) {
     lo_message_add_int32( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/output/error", msg );
+  sendMessage( this->targetAddress, "/minibee/output/error", msg );
   lo_message_free( msg );
 }
 
@@ -550,7 +550,7 @@ void HiveOscServer::sendForgetErrorMessage( int minibeeID, int errorState ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, errorState );
   lo_message_add_int32( msg, minibeeID );
-  sendMessage( targetAddress, "/minibee/forget/error", msg );
+  sendMessage( this->targetAddress, "/minibee/forget/error", msg );
   lo_message_free( msg );
 }
 
@@ -559,7 +559,7 @@ void HiveOscServer::sendRunErrorMessage( int minibeeID, int onoff, int errorStat
   lo_message_add_int32( msg, errorState );
   lo_message_add_int32( msg, minibeeID );
   lo_message_add_int32( msg, onoff );
-  sendMessage( targetAddress, "/minibee/run/error", msg );
+  sendMessage( this->targetAddress, "/minibee/run/error", msg );
   lo_message_free( msg );
 }
 
@@ -570,7 +570,7 @@ void HiveOscServer::sendCustomErrorMessage( int minibeeID, std::vector<int> * da
   for (auto n : *data) {
     lo_message_add_int32( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/custom/error", msg );
+  sendMessage( this->targetAddress, "/minibee/custom/error", msg );
   lo_message_free( msg );
 }
 
@@ -580,14 +580,14 @@ void HiveOscServer::sendOutputSuccessMessage( int minibeeID, std::vector<int> * 
   for (auto n : *data) {
     lo_message_add_int32( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/output/success", msg );
+  sendMessage( this->targetAddress, "/minibee/output/success", msg );
   lo_message_free( msg );
 }
 
 void HiveOscServer::sendForgetSuccessMessage( int minibeeID ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, minibeeID );
-  sendMessage( targetAddress, "/minibee/forget/success", msg );
+  sendMessage( this->targetAddress, "/minibee/forget/success", msg );
   lo_message_free( msg );
 }
 
@@ -595,7 +595,7 @@ void HiveOscServer::sendRunSuccessMessage( int minibeeID, int onoff ){
   lo_message msg = lo_message_new();
   lo_message_add_int32( msg, minibeeID );
   lo_message_add_int32( msg, onoff );
-  sendMessage( targetAddress, "/minibee/run/success", msg );
+  sendMessage( this->targetAddress, "/minibee/run/success", msg );
   lo_message_free( msg );
 }
 
@@ -605,7 +605,7 @@ void HiveOscServer::sendCustomSuccessMessage( int minibeeID, std::vector<int> * 
   for (auto n : *data) {
     lo_message_add_int32( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/custom/success", msg );
+  sendMessage( this->targetAddress, "/minibee/custom/success", msg );
   lo_message_free( msg );
 }
 
@@ -615,7 +615,7 @@ void HiveOscServer::sendOutputMessage( int minibeeID, std::vector<float> * data 
   for (auto n : *data) {
     lo_message_add_float( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/data", msg );
+  sendMessage( this->targetAddress, "/minibee/data", msg );
   lo_message_free( msg );
 }
 
@@ -626,7 +626,7 @@ void HiveOscServer::sendOutputBlockMessage( int minibeeID, int noSamples, std::v
   for (auto n : *data) {
     lo_message_add_float( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/data/block", msg );
+  sendMessage( this->targetAddress, "/minibee/data/block", msg );
   lo_message_free( msg );
 }
 
@@ -636,7 +636,7 @@ void HiveOscServer::sendPrivateMessage( int minibeeID, std::vector<float> * data
   for (auto n : *data) {
     lo_message_add_float( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/private", msg );
+  sendMessage( this->targetAddress, "/minibee/private", msg );
   lo_message_free( msg );  
 }
 
@@ -646,7 +646,7 @@ void HiveOscServer::sendTriggerMessage( int minibeeID, std::vector<float> * data
   for (auto n : *data) {
     lo_message_add_float( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/trigger", msg );
+  sendMessage( this->targetAddress, "/minibee/trigger", msg );
   lo_message_free( msg );    
 }
 
@@ -656,7 +656,7 @@ void HiveOscServer::sendPrivateMessage( int minibeeID, std::vector<unsigned char
   for (auto n : *data) {
     lo_message_add_int32( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/private", msg );
+  sendMessage( this->targetAddress, "/minibee/private", msg );
   lo_message_free( msg );  
 }
 
@@ -666,7 +666,7 @@ void HiveOscServer::sendTriggerMessage( int minibeeID, std::vector<unsigned char
   for (auto n : *data) {
     lo_message_add_int32( msg, n );
   }
-  sendMessage( targetAddress, "/minibee/trigger", msg );
+  sendMessage( this->targetAddress, "/minibee/trigger", msg );
   lo_message_free( msg );    
 }
 
