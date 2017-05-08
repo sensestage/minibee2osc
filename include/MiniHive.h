@@ -89,7 +89,9 @@ namespace libminibee {
 	int send_announce_to_minibee( int minibeeID );
 	
 	HiveOscServer * oscServer;
-
+	
+	libxbee::XBee * getXBee();
+	
     protected:
 	// moved from private
 // 	int numberOfBees;

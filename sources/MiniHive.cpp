@@ -614,6 +614,11 @@ int MiniXHive::setTargetAddress( const char * host, const char * port ){
     oscServer->setTargetAddress( host, port );
 }
 
+XBee* MiniXHive::getXBee()
+{
+  return this->xbee;
+}
+
 
 // ---------- osc messages to minibees ----------
 
