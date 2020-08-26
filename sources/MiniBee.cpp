@@ -208,111 +208,144 @@ void MiniXBee::parse_data( int msgsize, std::vector<unsigned char> data ){
   std::vector<float> parsed_data;
   // iterate over the dataBitSizes
   std::vector<unsigned char>::iterator itData = data.begin();
-  itData++; itData++; // 'd', msgid    
+  itData++; itData++; // 'd', msgid (data[0], data[1])
+
+  bool prev1bit = false;
+  int byteIndex = 0;
   
   for ( int i=0; i < configuration->getSamplesPerMessage(); i++ ){    
     std::vector<int>::iterator it = configuration->dataBitSizes.begin();
     std::vector<int>::iterator it2 = configuration->dataScales.begin();
     std::vector<int>::iterator it3 = configuration->dataOffsets.begin();
+    std::vector<int>::iterator it4 = configuration->dataTypes.begin();
     // TODO parse data
     unsigned char curData = (*itData);
-    int byteIndex = 0;
     int curBitSize = 0;
     int curBitIndex = 0;
 //     unsigned char curBitMask;
     float newdata;
-    bool prev1bit = false;
     while ( it != configuration->dataBitSizes.end() ){
   //     std::cout << "data: " << (*itData) << "bitsize: " << (*it) << ", dataScale: " << (*it2) << ", dataOffsets: " << (*it3) << std::endl;
       curBitSize = (*it);
       if ( curBitSize == 1 ){ // FIXME: this does not work correctly yet
-	prev1bit = true;
-	unsigned char myData = curData;
-	newdata = TAKE_N_BITS_FROM( myData, curBitIndex, curBitSize );
-// 	if ( curData & curBitMask ){
-// 	  newdata = 1;
-// 	} else {
-// 	  newdata = 0;
-// 	}
-	newdata = ( (float) newdata + (*it3) / (*it2) );
-	parsed_data.push_back(newdata);
-	curBitIndex++;
-// 	curBitMask << 1;
-	if ( curBitIndex == 8 ){
-	    prev1bit = false;
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    if ( itData == data.end() ){
-	      std::ostringstream oss;
-	      oss << "Data too short! Early return from data!" << std::endl;
-	      hive->writeToLog( 2, oss.str() );
-	      break;
-	    }
-	    curBitIndex = 0;
-// 	    curBitMask = 1;
-	}
+        prev1bit = true;
+        unsigned char myData = curData;
+        newdata = TAKE_N_BITS_FROM( myData, curBitIndex, curBitSize );
+    //  if ( curData & curBitMask ){
+    //    newdata = 1;
+    //  } else {
+    //    newdata = 0;
+    //  }
+        newdata = ( (float) newdata + (*it3) / (*it2) );
+        parsed_data.push_back(newdata);
+        curBitIndex++;
+        if ( curBitIndex == 8 ){
+            prev1bit = false;
+            itData++; byteIndex++;
+            curData = *itData;
+            if ( itData == data.end() ){
+                std::ostringstream oss;
+                oss << "Data too short! Early return from data!" << std::endl;
+                hive->writeToLog( 2, oss.str() );
+                break;
+            }
+            curBitIndex = 0;
+    //      curBitMask = 1;
+        }
       } else { // other options are 8, 16, 24 bit for now
-	if ( prev1bit ){
-	  prev1bit = false;
-	  curBitIndex = 0;
-	  itData++; byteIndex++;
-	  if ( itData == data.end() ){
-	      std::ostringstream oss;
-	      oss << "Data too short! Early return from data!" << std::endl;
-	      hive->writeToLog( 2, oss.str() );
-	      break;
-	  }
-	  curData = *itData;
-	}
-	switch( curBitSize ){
-	  case 8:
-	    newdata = ( (float) curData + (*it3) )/ (float) (*it2);
-	    parsed_data.push_back(newdata);
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    break;
-	  case 16:
-	    newdata = (float) curData * 256.;
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    newdata += (float) curData;
-	    newdata = (float) (newdata + (*it3)) / (float) (*it2 );
-	    parsed_data.push_back(newdata);
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    break;
-	  case 24:
-	    newdata = (float) curData * 256. * 256.;
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    newdata += (float) curData * 256.;
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    newdata += (float) curData;
-	    newdata = (newdata + (float) (*it3)) / (float) (*it2 );
-	    parsed_data.push_back(newdata);
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    break;
-	  case 32:
-	    newdata = (float) curData * 256. * 256. * 256.;
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    newdata += (float) curData * 256. * 256.;
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    newdata += (float) curData * 256.;
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    newdata += (float) curData;
-	    newdata = (newdata + (float) (*it3)) / (float) (*it2 );
-	    parsed_data.push_back(newdata);
-	    itData++; byteIndex++;
-	    curData = *itData;
-	    break;
-	}
+        if ( prev1bit ){
+            prev1bit = false;
+            curBitIndex = 0;
+            itData++; byteIndex++;
+            if ( itData == data.end() ){
+                std::ostringstream oss;
+                oss << "Data too short! Early return from data!" << std::endl;
+                hive->writeToLog( 2, oss.str() );
+                break;
+            }
+            curData = *itData;
+        }
+        unsigned char databytes16[2];
+        unsigned char databytes24[3];
+        unsigned char databytes32[4];
+        switch( curBitSize ){
+            case 8:
+                if ( (*it4) == 0 ){ // unsigned
+                    newdata = ( (float) curData + (*it3) )/ (float) (*it2);
+                } else { // signed -- cast to int8_t first
+                    newdata = ( (float) ((int8_t) curData) ) + (*it3) / (float) (*it2);
+                }
+                parsed_data.push_back(newdata);
+                itData++; byteIndex++;
+                curData = *itData;
+                break;
+            case 16:
+                databytes16[0] = curData; // msb
+                itData++; byteIndex++;
+                curData = *itData;
+                databytes16[1] = curData; // lsb          
+                if ( (*it4) == 0 ){ // unsigned
+                    newdata = (float) ( databytes16[0]<<8 | (databytes16[1] & 0xff) );
+                } else { // signed -- cast to int8_t first                   
+                    int newvalue;
+                    newvalue = (int16_t) ( databytes16[0]<<8 | (databytes16[1] & 0xff) );
+//                     newvalue = *((int*)&databytes16[0]); // interpret as signed int first
+                    newdata = (float) newvalue;
+                }
+                newdata = (float) (newdata + (*it3)) / (float) (*it2 );
+                parsed_data.push_back(newdata);
+                itData++; byteIndex++;
+                curData = *itData;
+                break;
+            case 24:
+                databytes24[0] = curData;
+                itData++; byteIndex++;
+                curData = *itData;
+                databytes24[1] = curData;                
+                itData++; byteIndex++;
+                curData = *itData;
+                databytes24[2] = curData;                
+
+                if ( (*it4) == 0 ){ // unsigned
+                    newdata = (float) ( databytes24[0]<<16 | databytes24[1]<<8 | (databytes24[2] & 0xff) );
+                } else { // signed -- cast to int8_t first                   
+                    int newvalue;
+//                     newvalue = (int24_t) ( databytes24[0]<<16 | databytes24[1]<<8 | (databytes24[2] & 0xff) );
+                    newvalue = (int32_t) ( databytes24[0]<<16 | databytes24[1]<<8 | (databytes24[2] & 0xff) ); // FIXME: int24_t does not exist standard. Getting the two's complement work right for this will be tricky
+                    newdata = (float) newvalue;
+                }
+                newdata = (newdata + (float) (*it3)) / (float) (*it2 );
+                parsed_data.push_back(newdata);
+                itData++; byteIndex++;
+                curData = *itData;
+                break;
+            case 32:
+                databytes32[0] = curData;
+                itData++; byteIndex++;
+                curData = *itData;
+                databytes32[1] = curData;                
+                itData++; byteIndex++;
+                curData = *itData;
+                databytes32[2] = curData;                
+                itData++; byteIndex++;
+                curData = *itData;
+                databytes32[3] = curData;                
+                
+                if ( (*it4) == 0 ){ // unsigned
+                    newdata = (float) ( databytes32[0]<<24 | databytes32[1]<<16 | databytes32[2]<<8 | (databytes32[3] & 0xff) );; 
+                } else { // signed -- cast to int8_t first                   
+                    int newvalue;
+                    newvalue = (int32_t) ( databytes32[0]<<24 | databytes32[1]<<16 | databytes32[2]<<8 | (databytes32[3] & 0xff) );
+                    newdata = (float) newvalue;
+                }                
+                newdata = (newdata + (float) (*it3)) / (float) (*it2 );
+                parsed_data.push_back(newdata);
+                itData++; byteIndex++;
+                curData = *itData;
+                break;
+            }
       }
-      it++; it2++; it3++;
+      it++; it2++; it3++; it4++;
     }
   }
   

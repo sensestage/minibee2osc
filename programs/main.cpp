@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
       hive->setTargetAddress( targetip, targetport );
       std::cout << "Created OSC interface...\n";
       if ( loglevel > 0 ){
-	hive->oscServer->debug(true);
+        hive->oscServer->debug(true);
       }
       hive->startOSC();
   
@@ -204,21 +204,21 @@ int main(int argc, char *argv[]) {
 
       char s[10];
       while ( !done ){
-	if ( hive->hasQuit() ){
-	    done = 1;
-	}
+        if ( hive->hasQuit() ){
+            done = 1;
+        }
 // 	hive->tick();
 // 	hive->waitForPacket();
 // 	res = hive->waitForOSC();
 // 	    std::cout << "Number of received OSC messages: " << res << std::endl;
 	//FIXME unfortunately this blocks:
-	std::cin.getline(s,10);
+        std::cin.getline(s,10);
 // // 	    std::cout << "input: " << s << "\n";
-	if(strcmp(s,"quit")==0){ 
-	  std::cout << "Got request to quit!\n";
-	  done = 1; 	      
-	}
-	usleep(1000); // 500 microseconds = 0.5 ms
+        if(strcmp(s,"quit")==0){ 
+            std::cout << "Got request to quit!\n";
+            done = 1; 	      
+        }
+        usleep(1000); // 500 microseconds = 0.5 ms
       }
       hive->stopOSC();
       std::cout << "Exiting minibee2osc...\n";

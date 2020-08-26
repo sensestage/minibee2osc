@@ -164,12 +164,13 @@ void MiniBeeConfigFile::readConfigurationElement( const XMLElement * ele, MiniBe
   
   if ( customnode != NULL ){
       for( const XMLElement* subnode=customnode->FirstChildElement("data"); subnode; subnode=subnode->NextSiblingElement( "data" ) ) {
-	int id=0, offset=0, scale=1, size=1;
+	int id=0, offset=0, scale=1, size=1, type=0;
 	subnode->QueryIntAttribute( "id", &id );
 	subnode->QueryIntAttribute( "offset", &offset );
 	subnode->QueryIntAttribute( "scale", &scale );
 	subnode->QueryIntAttribute( "size", &size );
-	config->addCustomConfig( id, offset, scale, size );
+    subnode->QueryIntAttribute( "type", &type ); // 0: unsigned, 1: signed
+	config->addCustomConfig( id, offset, scale, size, type );
 //      std::string customLabel = std::string( subnode->Attribute( "name" ) ); // FIXME
       }
   }

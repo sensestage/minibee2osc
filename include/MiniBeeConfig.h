@@ -60,6 +60,7 @@ namespace libminibee {
       std::vector<int> dataBitSizes; // how many bits take up a value
       std::vector<int> dataOffsets; // offset of data
       std::vector<int> dataScales;  // scaling factor of data
+      std::vector<int> dataTypes;  // type of data (unsigned: 0, signed: 1)
       
       unsigned char getConfigID();
       
@@ -71,7 +72,7 @@ namespace libminibee {
       
       void addPinConfig( int id, unsigned char config );
       void addTWIConfig( int id, unsigned char config );
-      void addCustomConfig( int id, int offset, int scale, unsigned char size );
+      void addCustomConfig( int id, int offset, int scale, unsigned char size, int type );
       
       void setNumberOfTWIs( int no );
       void setNumberOfCustomInputs( int no );
@@ -92,6 +93,7 @@ namespace libminibee {
 //       unsigned char * customInputPins;
       int * customInputOffsets;
       int * customInputScales;
+      int * customInputTypes;
       
       unsigned char pinConfig[19];
       

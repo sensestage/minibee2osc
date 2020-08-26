@@ -55,12 +55,14 @@ void MiniBeeConfig::setNumberOfCustomInputs( int no ){
 //       delete customInputPins;
       delete customInputScales;
       delete customInputOffsets;
+      delete customInputTypes;
   }
   numberOfCustomInputs = (unsigned char) no;
   if ( numberOfCustomInputs > 0 ){
     customInputSizes = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
     customInputScales = (int*) malloc(numberOfCustomInputs * sizeof( int ) );
     customInputOffsets = (int*) malloc(numberOfCustomInputs * sizeof( int ) );
+    customInputTypes = (int*) malloc(numberOfCustomInputs * sizeof( int ) );
 //     customInputPins = (unsigned char*) malloc(numberOfCustomInputs * sizeof( unsigned char ) );
   }
 }
@@ -73,11 +75,12 @@ void MiniBeeConfig::addTWIConfig( int id, unsigned char config ){
   twiConfig[ id ] = config;
 }
 
-void MiniBeeConfig::addCustomConfig( int id, int offset, int scale, unsigned char size ){
+void MiniBeeConfig::addCustomConfig( int id, int offset, int scale, unsigned char size, int type ){
 //   customInputPins[ id ] = pinid;
   customInputSizes[ id ] = size;
   customInputOffsets[ id ] = offset;
   customInputScales[ id ] = scale;
+  customInputTypes[ id ] = type;
 }
 
 MiniBeeConfig::~MiniBeeConfig(){
@@ -109,19 +112,20 @@ void MiniBeeConfig::calcDataProperties(void){
   for ( i=0; i<numberOfCustomInputs; i++ ){
     dataScales.push_back( customInputScales[i] );
     dataOffsets.push_back( customInputOffsets[i] );
+    dataTypes.push_back( customInputTypes[i] );
       switch ( customInputSizes[i] ){
-	case 1: 
-	  dataBitSizes.push_back(8);
-	  break;
-	case 2: 
-	  dataBitSizes.push_back(16);
-	  break;
-	case 3: 
-	  dataBitSizes.push_back(24);
-	  break;
-	case 4: 
-	  dataBitSizes.push_back(32);
-	  break;
+        case 1: 
+            dataBitSizes.push_back(8);
+        break;
+        case 2: 
+            dataBitSizes.push_back(16);
+        break;
+        case 3: 
+            dataBitSizes.push_back(24);
+        break;
+        case 4: 
+            dataBitSizes.push_back(32);
+        break;
       }
   }
   
@@ -129,109 +133,128 @@ void MiniBeeConfig::calcDataProperties(void){
   for ( i=0; i<19; i++ ){ // digital first
     switch ( pinConfig[i] ){
       case DigitalOut:
-	// dataOutSizes.push_back( 1 );
-	break;
+        // dataOutSizes.push_back( 1 );
+        break;
       case AnalogOut:
-	// dataOutSizes.push_back( 1 );
-	break;
+        // dataOutSizes.push_back( 1 );
+        break;
       case DigitalIn:
       case DigitalInPullup:
-// 	numberOfDigitalIns++;
-	dataBitSizes.push_back( 1 );
-	dataScales.push_back( 1 );
-	dataOffsets.push_back( 0 );
-	break;
+        // 	numberOfDigitalIns++;
+        dataBitSizes.push_back( 1 );
+        dataScales.push_back( 1 );
+        dataOffsets.push_back( 0 );
+        dataTypes.push_back( 0 );
+        break;
     }
   }
   for ( i=0; i<19; i++ ){ // then analog
     switch ( pinConfig[i] ){
       case AnalogIn:
-	dataBitSizes.push_back( 8 );
-	dataScales.push_back( 255 );
-	dataOffsets.push_back( 0 );
-	break;
+        dataBitSizes.push_back( 8 );
+        dataScales.push_back( 255 );
+        dataOffsets.push_back( 0 );
+        dataTypes.push_back( 0 );
+        break;
       case AnalogIn10bit:
-	dataBitSizes.push_back( 16 );
-	dataScales.push_back( 1023 );
-	dataOffsets.push_back( 0 );
-	break;
+        dataBitSizes.push_back( 16 );
+        dataScales.push_back( 1023 );
+        dataOffsets.push_back( 0 );
+        dataTypes.push_back( 0 );
+        break;
     }
   }
   // then twi
    for ( i=0; i<numberOfTWIs; i++ ){ // then twis
     switch ( twiConfig[i] ){
       case TWI_ADXL345:
-	dataBitSizes.push_back( 16 );
-	dataBitSizes.push_back( 16 );
-	dataBitSizes.push_back( 16 );
-	dataScales.push_back( 8191 );
-	dataScales.push_back( 8191 );
-	dataScales.push_back( 8191 );
-	dataOffsets.push_back( 0 );
-	dataOffsets.push_back( 0 );
-	dataOffsets.push_back( 0 );
-	break;
+        dataBitSizes.push_back( 16 );
+        dataBitSizes.push_back( 16 );
+        dataBitSizes.push_back( 16 );
+        dataScales.push_back( 8191 );
+        dataScales.push_back( 8191 );
+        dataScales.push_back( 8191 );
+        dataOffsets.push_back( 0 );
+        dataOffsets.push_back( 0 );
+        dataOffsets.push_back( 0 );
+        dataTypes.push_back( 0 );
+        dataTypes.push_back( 0 );
+        dataTypes.push_back( 0 );
+        break;
       case TWI_LIS302DL:
-	dataBitSizes.push_back( 8 );
-	dataBitSizes.push_back( 8 );
-	dataBitSizes.push_back( 8 );
-	dataScales.push_back( 255 );
-	dataScales.push_back( 255 );
-	dataScales.push_back( 255 );
-	dataOffsets.push_back( 0 );
-	dataOffsets.push_back( 0 );
-	dataOffsets.push_back( 0 );
-	break;
+        dataBitSizes.push_back( 8 );
+        dataBitSizes.push_back( 8 );
+        dataBitSizes.push_back( 8 );
+        dataScales.push_back( 255 );
+        dataScales.push_back( 255 );
+        dataScales.push_back( 255 );
+        dataOffsets.push_back( 0 );
+        dataOffsets.push_back( 0 );
+        dataOffsets.push_back( 0 );
+        dataTypes.push_back( 0 );
+        dataTypes.push_back( 0 );
+        dataTypes.push_back( 0 );
+        break;
       case TWI_BMP085:
-	dataBitSizes.push_back( 16 );
-	dataBitSizes.push_back( 24 );
-	dataBitSizes.push_back( 24 );
-	dataScales.push_back( 100 );
-	dataScales.push_back( 100 );
-	dataScales.push_back( 100 );
-	dataOffsets.push_back( 27300 );
-	dataOffsets.push_back( 0 );
-	dataOffsets.push_back( 10000 );
-	break;
+        dataBitSizes.push_back( 16 );
+        dataBitSizes.push_back( 24 );
+        dataBitSizes.push_back( 24 );
+        dataScales.push_back( 100 );
+        dataScales.push_back( 100 );
+        dataScales.push_back( 100 );
+        dataOffsets.push_back( 27300 );
+        dataOffsets.push_back( 0 );
+        dataOffsets.push_back( 10000 );
+        dataTypes.push_back( 0 );
+        dataTypes.push_back( 0 );
+        dataTypes.push_back( 0 );
+        break;
       case TWI_TMP102:
-	dataBitSizes.push_back( 16 );
-	dataScales.push_back( 16 );
-	dataOffsets.push_back( 2048 );
-	break;
+        dataBitSizes.push_back( 16 );
+        dataScales.push_back( 16 );
+        dataOffsets.push_back( 2048 );
+        dataTypes.push_back( 0 );
+        break;
       case TWI_HMC58X3:
-	dataBitSizes.push_back( 16 );
-	dataBitSizes.push_back( 16 );
-	dataBitSizes.push_back( 16 );
-	dataScales.push_back( 2047 );
-	dataScales.push_back( 2047 );
-	dataScales.push_back( 2047 );
-	dataOffsets.push_back( 2048 );
-	dataOffsets.push_back( 2048 );
-	dataOffsets.push_back( 2048 );
-	break;
+        dataBitSizes.push_back( 16 );
+        dataBitSizes.push_back( 16 );
+        dataBitSizes.push_back( 16 );
+        dataScales.push_back( 2047 );
+        dataScales.push_back( 2047 );
+        dataScales.push_back( 2047 );
+        dataOffsets.push_back( 2048 );
+        dataOffsets.push_back( 2048 );
+        dataOffsets.push_back( 2048 );
+        dataTypes.push_back( 0 );
+        dataTypes.push_back( 0 );
+        dataTypes.push_back( 0 );
+        break;
     }
   }
   
   for ( i=0; i<19; i++ ){ // then sht
     switch ( pinConfig[i] ){
       case SHTData:
-	dataBitSizes.push_back( 16 );
-	dataBitSizes.push_back( 16 );
-	dataOffsets.push_back( 0 );
-	dataOffsets.push_back( 0 );
-	dataScales.push_back( 1 );
-	dataScales.push_back( 1 );
-	break;
+        dataBitSizes.push_back( 16 );
+        dataBitSizes.push_back( 16 );
+        dataOffsets.push_back( 0 );
+        dataOffsets.push_back( 0 );
+        dataScales.push_back( 1 );
+        dataScales.push_back( 1 );
+        dataTypes.push_back( 0 );
+        dataTypes.push_back( 0 );
+        break;
     }
   }
 
   for ( i=0; i<19; i++ ){ // then ping
     switch ( pinConfig[i] ){
       case Ping:
-	dataBitSizes.push_back( 16 );
-	dataOffsets.push_back( 0 );
-	dataScales.push_back( 1 ); // actually 61.9195
-	break;
+        dataBitSizes.push_back( 16 );
+        dataOffsets.push_back( 0 );
+        dataScales.push_back( 1 ); // actually 61.9195
+        dataTypes.push_back( 0 );        
+        break;
     }
   }
 
