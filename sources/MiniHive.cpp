@@ -608,10 +608,12 @@ int MiniXHive::createOSCServer(const char* port)
   writeToLog(10, oss.str() );
   oscServer->setHive( this );
   oscServer->addBasicMethods();
+  return 0;
 }
 
 int MiniXHive::setTargetAddress( const char * host, const char * port ){
     oscServer->setTargetAddress( host, port );
+    return 0;
 }
 
 XBee* MiniXHive::getXBee()
