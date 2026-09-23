@@ -67,4 +67,4 @@ There are various options that can be passed onto minibee2osc:
 
 General documentation on the Sense/Stage MiniBee can be found here: https://docs.sensestage.eu/sensestage-v1/
 
-This software package is a replacement for pydon. To use it you need to reconfigure your coordinator node to use API mode 1. You can use [X-CTU for this](https://docs.sensestage.eu/sensestage-v1/adding-new-minibees-to-a-network-with-xctu/).
+This software package is a replacement for [pydon](https://github.com/sensestage/ssdn_python). To use it you need to reconfigure your coordinator node to use API mode 1. You can use [X-CTU for this](https://docs.sensestage.eu/sensestage-v1/adding-new-minibees-to-a-network-with-xctu/).
