@@ -1,6 +1,7 @@
-##Dependencies
+## Dependencies
 
 * libxbee: communication with the xbee
+  
 Website: https://github.com/attie/libxbee3
 
 To install on your system:
@@ -14,7 +15,10 @@ To install on your system:
 * liblo: communication via osc. Probably available through your
   package manager.
 
-Arch Linux: 
+* tinyxml2: for reading the XML configuration files. Probably available through your
+  package manager.
+
+## Arch Linux: 
 ```bash
 sudo pacman -S liblo
 ```
