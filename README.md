@@ -42,6 +42,7 @@ sudo pacman -S qt5-base
     cd minibee2osc
     mkdir build
     cd build
+    cmake ..
     make
     sudo make install
 ```
