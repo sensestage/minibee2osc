@@ -148,11 +148,17 @@ int main(int argc, char *argv[]) {
             break;
 
 	case 'h':
-	    printf("option help\n");
-            break;
-
 	case '?':
-// 	    printf("getopt returned ?\n");
+	    printf("Startup options:\n");
+        printf("--configfile (-c): the XML configuration file to use (default example_hiveconfig.xml)\n");
+        printf("--serialport (-s): the serial port to use (default /dev/ttysUSB1)\n");
+        printf("--listenport (-l): the UDP port to listen on for OSC messages (default 57600)\n");
+        printf("--targetport (-p): the UDP port to send OSC messages to (default 57120)\n");
+        printf("--targetip (-i): the IP address to send OSC message to (default 127.0.0.1 (localhost))\n");
+        printf("--loglevel (-v): how much output the program should generate for debugging (default 0)\n");
+        printf("--help (-h): get help info");
+        printf("\n");
+        printf("\n");
             break;
 
 // 	default:
