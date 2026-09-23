@@ -18,6 +18,8 @@ To install on your system:
 * tinyxml2: for reading the XML configuration files. Probably available through your
   package manager.
 
+* CMake: for building
+
 ## Arch Linux: 
 ```bash
 sudo pacman -S liblo
