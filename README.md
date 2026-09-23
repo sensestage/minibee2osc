@@ -1,3 +1,5 @@
+# Installation
+
 ## Dependencies
 
 * libxbee: communication with the xbee
@@ -48,3 +50,17 @@ sudo pacman -S qt5-base
     make
     sudo make install
 ```
+
+# Usage
+
+There are various options that can be passed onto minibee2osc:
+
+- configfile (-c): the XML configuration file to use (default `example_hiveconfig.xml`)
+- serialport (-s): the serial port to use (default `/dev/ttysUSB1`)
+- listenport (-l): the UDP port to listen on for OSC messages (default `57600`)
+- targetport (-p): the UDP port to send OSC messages to (default `57120`)
+- targetip (-i): the IP address to send OSC message to (default `127.0.0.1` (localhost))
+- loglevel (-v): how much output the program should generate for debugging (default `0`)
+- help (-h): get help info
+
+General documentation on the Sense/Stage MiniBee can be found here: https://docs.sensestage.eu/sensestage-v1/
